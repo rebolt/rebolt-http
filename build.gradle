@@ -1,0 +1,38 @@
+apply plugin: "java"
+
+[compileJava, compileTestJava]*.options*.encoding = "UTF-8"
+[compileJava, compileTestJava]*.options*.compilerArgs = ["-Xlint:-options"]
+
+group = "rebolt"
+version = "0.1.0"
+
+project.ext {
+  name = "rebolt-http"
+}
+
+jar {
+  baseName = project.name
+  version = project.version
+}
+
+allprojects {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+  repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+  }
+}
+
+dependencies {
+  compile "com.github.rebolt:rebolt-core:master-SNAPSHOT"
+  testCompile "junit:junit:$ver_junit"
+}
+
+//noinspection GroovyAssignabilityCheck
+configurations.all {
+  //noinspection GroovyAssignabilityCheck
+  ResolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
