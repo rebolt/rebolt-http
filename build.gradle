@@ -33,6 +33,10 @@ dependencies {
 //noinspection GroovyAssignabilityCheck
 configurations.all {
   //noinspection GroovyAssignabilityCheck
-  ResolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+  resolutionStrategy {
+    // cache dynamic versions for realtime
+    cacheDynamicVersionsFor 0, 'seconds'
+    // don't cache changing modules at all
+    cacheChangingModulesFor 0, 'seconds'
+  }
 }
-
