@@ -25,8 +25,18 @@ allprojects {
   }
 }
 
+sourceSets {
+  [main, perf, test]
+}
+
 dependencies {
-  compile "com.github.rebolt:rebolt-core:master-SNAPSHOT"
+  compile "com.github.rebolt:rebolt-core:dev-SNAPSHOT"
+
+  perfCompile project
+  perfCompile "org.openjdk.jmh:jmh-core:$ver_jmh"
+  perfCompile "org.openjdk.jmh:jmh-core-benchmarks:$ver_jmh"
+  perfCompile "org.openjdk.jmh:jmh-generator-annprocess:$ver_jmh"
+
   testCompile "junit:junit:$ver_junit"
 }
 
