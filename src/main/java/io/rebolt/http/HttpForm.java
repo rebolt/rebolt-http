@@ -4,13 +4,20 @@ import com.google.common.collect.Maps;
 import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.ObjectUtil;
+import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
+
+import static io.rebolt.core.constants.Constant.STRING_AND;
+import static io.rebolt.core.constants.Constant.STRING_EMPTY;
+import static io.rebolt.core.constants.Constant.STRING_EQUAL;
 
 /**
  * Http 통신시 사용하는 Form 데이터를 관리할 수 있다
  */
+@ToString
 public final class HttpForm implements IModel<HttpForm> {
   private static final long serialVersionUID = 3140816378576917540L;
   private @Getter Map<String, String> queryMap;
@@ -55,6 +62,15 @@ public final class HttpForm implements IModel<HttpForm> {
   public HttpForm addAll(Map<String, String> queryMap) {
     this.queryMap.putAll(queryMap);
     return this;
+  }
+
+  /**
+   * Form 문자열로 변환
+   */
+  public final String toFormString() {
+    StringBuilder builder = new StringBuilder();
+    ObjectUtil.nullGuard(queryMap).forEach((key, value) -> builder.append(key).append(STRING_EQUAL).append(StringUtil.encodeUrl(value)).append(STRING_AND));
+    return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : STRING_EMPTY;
   }
 
   @Override

@@ -6,6 +6,7 @@ import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import static io.rebolt.http.HttpHeader.Header.Accept;
 import static io.rebolt.http.HttpHeader.Header.ContentType;
 import static io.rebolt.http.HttpHeader.Header.UserAgent;
 
+@ToString
 public final class HttpHeader implements IModel<HttpHeader> {
   private static final long serialVersionUID = 576771757645112134L;
   private @Getter Map<String, String> headers;

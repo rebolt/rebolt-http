@@ -1,24 +1,40 @@
 package io.rebolt.http.exceptions;
 
 import io.rebolt.core.exceptions.ReboltException;
+import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpStatus;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.logging.log4j.Level;
 
+import static io.rebolt.core.constants.Constant.STRING_EMPTY;
+
 @ToString
 public final class HttpException extends ReboltException {
   private static final long serialVersionUID = -557421899949901475L;
-  protected @Getter final HttpStatus httpStatus;
+  private @Getter final HttpStatus status;
+  private @Getter final String message;
 
-  public HttpException(int httpStatus) {
-    this.httpStatus = HttpStatus.lookup(httpStatus);
-    super.setMessage("http_status: " + httpStatus);
+  public HttpException(int status) {
+    this(HttpStatus.lookup(status), STRING_EMPTY);
   }
 
-  public HttpException(HttpStatus httpStatus) {
-    this.httpStatus = httpStatus;
-    super.setMessage("http_status: " + httpStatus);
+  public HttpException(int status, String message) {
+    this(HttpStatus.lookup(status), message);
+  }
+
+  public HttpException(HttpStatus status) {
+    this(status, STRING_EMPTY);
+  }
+
+  public HttpException(final HttpStatus status, final String message) {
+    this.status = status;
+    this.message = message;
+    super.setMessage("http_status: " + status + ", " + message);
+  }
+
+  public boolean hasError() {
+    return ObjectUtil.isNull(status) || status.hasError();
   }
 
   @Override

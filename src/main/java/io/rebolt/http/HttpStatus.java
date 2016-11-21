@@ -45,6 +45,10 @@ public enum HttpStatus {
   private final @Getter int code;
   private final @Getter String status;
 
+  public boolean hasError() {
+    return code < 200 || code >= 400;
+  }
+
   public static HttpStatus lookup(Integer code) {
     return codeMap.get(code);
   }

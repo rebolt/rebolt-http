@@ -4,6 +4,7 @@ import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ import java.util.Objects;
  * <p>
  * Http 요청을 하기 위해서는 {@link HttpRequest} 인스턴스를 생성한다.
  */
+@ToString
 public final class HttpRequest<T> implements IModel<HttpRequest> {
   private static final long serialVersionUID = -8573892752367366044L;
   private @Getter HttpHeader header;
@@ -40,9 +42,7 @@ public final class HttpRequest<T> implements IModel<HttpRequest> {
 
   @Override
   public boolean isEmpty() {
-    return Objects.isNull(method)
-        || Objects.isNull(body)
-        || StringUtil.isNullOrEmpty(uri);
+    return Objects.isNull(method) || Objects.isNull(body) || StringUtil.isNullOrEmpty(uri);
   }
 
   @Override
@@ -52,10 +52,7 @@ public final class HttpRequest<T> implements IModel<HttpRequest> {
 
   @Override
   public boolean equals(HttpRequest httpRequest) {
-    return header.equals(httpRequest.getHeader())
-        && method.equals(httpRequest.getMethod())
-        && uri.equals(httpRequest.getUri())
-        && body.equals(httpRequest.getBody());
+    return httpRequest != null && httpRequest.deepHash() == this.deepHash();
   }
 }
 

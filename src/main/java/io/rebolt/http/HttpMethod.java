@@ -4,9 +4,11 @@ import com.google.common.collect.Maps;
 import io.rebolt.core.exceptions.NotSupportedException;
 import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Map;
 
+@ToString
 public enum HttpMethod {
 
   Get("get"),
