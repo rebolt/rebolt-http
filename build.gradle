@@ -31,6 +31,7 @@ sourceSets {
 
 dependencies {
   compile "com.github.rebolt:rebolt-core:dev-SNAPSHOT"
+  compile "com.squareup.okhttp3:okhttp:$ver_okhttp"
 
   perfCompile project
   perfCompile "org.openjdk.jmh:jmh-core:$ver_jmh"
