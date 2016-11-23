@@ -10,6 +10,7 @@ import io.rebolt.http.HttpResponse;
  *
  * @param <Q> 통신엔진에서 사용하는 Request 클래스
  * @param <R> 통신엔진에서 사용하는 Response 클래스
+ * @since 0.1.0
  */
 public abstract class AbstractTemplate<Q, R> {
 
@@ -28,5 +29,14 @@ public abstract class AbstractTemplate<Q, R> {
    */
   public abstract HttpResponse makeResponse(R response);
 
-  public abstract R internalInvoke(Q request, int retryCount);
+  /**
+   * 통신엔진에 맞는 요청/응답을 처리한다.
+   * 기본적으로 retryCount가 있어 그 수만큼 재시도를 처리한다.
+   *
+   * @param request 통신엔진에서 사용하는 Request 인스턴스
+   * @param retryCount 재시도수
+   * @return 통신엔진에서 사용하는 Response 인스턴스
+   * @since 0.1.0
+   */
+  public abstract R invokeInternal(Q request, int retryCount);
 }

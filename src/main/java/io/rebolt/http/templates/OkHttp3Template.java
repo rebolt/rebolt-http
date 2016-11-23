@@ -20,7 +20,7 @@ public final class OkHttp3Template extends AbstractTemplate<Request, Response> {
   }
 
   @Override
-  public Response internalInvoke(Request request, int retryCount) {
+  public Response invokeInternal(Request request, int retryCount) {
     return null;
   }
 }

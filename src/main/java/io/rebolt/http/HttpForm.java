@@ -10,9 +10,9 @@ import lombok.ToString;
 
 import java.util.Map;
 
-import static io.rebolt.core.constants.Constant.STRING_AND;
-import static io.rebolt.core.constants.Constant.STRING_EMPTY;
-import static io.rebolt.core.constants.Constant.STRING_EQUAL;
+import static io.rebolt.core.constants.Constants.STRING_AND;
+import static io.rebolt.core.constants.Constants.STRING_EMPTY;
+import static io.rebolt.core.constants.Constants.STRING_EQUAL;
 
 /**
  * Http 통신시 사용하는 Form 데이터를 관리할 수 있다

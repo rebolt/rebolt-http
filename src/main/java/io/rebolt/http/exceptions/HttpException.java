@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.apache.logging.log4j.Level;
 
-import static io.rebolt.core.constants.Constant.STRING_EMPTY;
+import static io.rebolt.core.constants.Constants.STRING_EMPTY;
 
 @ToString
 public final class HttpException extends ReboltException {

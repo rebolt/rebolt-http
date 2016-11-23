@@ -11,11 +11,27 @@ import io.rebolt.http.templates.AbstractTemplate;
  */
 public final class SyncFactory extends AbstractFactory {
 
+  public SyncFactory(AbstractTemplate template) {
+    super.setTemplate(template);
+  }
+
+  /**
+   * 요청
+   *
+   * @param httpRequest 요청객체
+   * @param <Q> 페이로드 요청클래스
+   * @param <R> 페이로드 응답클래스
+   * @return {@link HttpResponse}
+   * @since 1.0
+   */
   public SyncFactory(final AbstractTemplate template) {
     setTemplate(template);
   }
 
   public <Q, R> HttpResponse<R> invoke(HttpRequest<Q> httpRequest) {
+
+    // step 1 : make Request
+
     return null;
   }
 
