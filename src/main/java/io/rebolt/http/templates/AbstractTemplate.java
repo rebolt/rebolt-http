@@ -1,5 +1,6 @@
 package io.rebolt.http.templates;
 
+import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
 
 /**
@@ -12,17 +13,20 @@ import io.rebolt.http.HttpResponse;
  */
 public abstract class AbstractTemplate<Q, R> {
 
+  private Class<Q> request;
+  private Class<R> response;
+
   /**
    * 요청 객체를 생성한다.
    */
-  public abstract Q makeRequest();
+  public abstract Q makeRequest(HttpRequest request);
 
   /**
    * 반환 객체를 생성한다.
    *
    * @return {@link HttpResponse} rebolt-http에서 사용하는 반환 객체
    */
-  public abstract HttpResponse makeResponse();
+  public abstract HttpResponse makeResponse(R response);
 
   public abstract R internalInvoke(Q request, int retryCount);
 }

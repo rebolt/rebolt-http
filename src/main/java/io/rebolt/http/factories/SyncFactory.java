@@ -2,6 +2,7 @@ package io.rebolt.http.factories;
 
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
+import io.rebolt.http.templates.AbstractTemplate;
 
 /**
  * SyncFactory
@@ -9,6 +10,10 @@ import io.rebolt.http.HttpResponse;
  * 동기 패턴을 사용하는 {@link AbstractFactory} 추상 클래스
  */
 public final class SyncFactory extends AbstractFactory {
+
+  public SyncFactory(final AbstractTemplate template) {
+    setTemplate(template);
+  }
 
   public <Q, R> HttpResponse<R> invoke(HttpRequest<Q> httpRequest) {
     return null;
