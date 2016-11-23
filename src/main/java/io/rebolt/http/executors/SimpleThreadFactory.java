@@ -6,6 +6,8 @@ import java.util.concurrent.ThreadFactory;
 
 /**
  * 기본 제공하는 {@link ThreadFactory}
+ *
+ * @since 1.0
  */
 public class SimpleThreadFactory implements ThreadFactory {
   private final boolean daemon;

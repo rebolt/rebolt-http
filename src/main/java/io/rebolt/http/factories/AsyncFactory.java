@@ -9,6 +9,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  * AsyncFactory
  * <p>
  * 비동기 패턴을 사용하는 {@link AbstractFactory} 추상 클래스
+ *
+ * @since 1.0
  */
 public final class AsyncFactory extends AbstractFactory {
 

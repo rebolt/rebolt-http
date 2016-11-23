@@ -7,6 +7,8 @@ import okhttp3.Response;
 
 /**
  * OkHttp3 라이브러리를 사용한 {@link AbstractTemplate}
+ *
+ * @since 1.0
  */
 public final class OkHttp3Template extends AbstractTemplate<Request, Response> {
   @Override
@@ -20,7 +22,7 @@ public final class OkHttp3Template extends AbstractTemplate<Request, Response> {
   }
 
   @Override
-  public Response invokeInternal(Request request, int retryCount) {
+  public Response invokeInternal(Request request) {
     return null;
   }
 }

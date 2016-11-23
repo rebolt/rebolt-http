@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 요청큐의 기본 갯수는 1,000,000개로 서버의 메모리상태, 스레드풀정책에 따라 적절히 조정할
  * 수 있다.
+ *
+ * @since 1.0
  */
 public final class LinkedBlockingThreadExecutor extends ThreadPoolExecutor {
   /**
