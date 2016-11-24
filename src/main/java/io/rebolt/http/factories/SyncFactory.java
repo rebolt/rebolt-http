@@ -16,8 +16,8 @@ import java.util.Objects;
  */
 public final class SyncFactory extends AbstractFactory {
 
-  public SyncFactory(Class<? extends AbstractEngine> templateClass) {
-    super.setTemplate(ClassUtil.newInstance(templateClass));
+  public SyncFactory(Class<? extends AbstractEngine> engineClass) {
+    super.setEngine(ClassUtil.newInstance(engineClass));
   }
 
   /**
@@ -31,7 +31,7 @@ public final class SyncFactory extends AbstractFactory {
    */
   @SuppressWarnings("unchecked")
   public <Q, R> HttpResponse<R> invoke(HttpRequest<Q> httpRequest) {
-    Objects.requireNonNull(template);
-    return (HttpResponse<R>) template.makeResponse(template.invoke(template.makeRequest(httpRequest)));
+    Objects.requireNonNull(engine);
+    return (HttpResponse<R>) engine.makeResponse(engine.invoke(engine.makeRequest(httpRequest)));
   }
 }

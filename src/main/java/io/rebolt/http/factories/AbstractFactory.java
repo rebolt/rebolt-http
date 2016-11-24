@@ -11,31 +11,31 @@ import io.rebolt.http.engines.AbstractEngine;
  */
 public abstract class AbstractFactory {
 
-  protected AbstractEngine template;
+  protected AbstractEngine engine;
 
   /**
    * 통신엔진 설정
    *
-   * @param template {@link AbstractEngine}
+   * @param engine {@link AbstractEngine}
    */
-  protected void setTemplate(AbstractEngine template) {
-    this.template = template;
+  protected void setEngine(AbstractEngine engine) {
+    this.engine = engine;
   }
 
   /**
    * 커넥션 타임아웃 설정
    */
   public void setConnectionTimeout(int connectionTimeout) {
-    ObjectUtil.requireNonNull(template);
-    template.setConnectionTimeout(connectionTimeout);
+    ObjectUtil.requireNonNull(engine);
+    engine.setConnectionTimeout(connectionTimeout);
   }
 
   /**
    * 타임아웃 설정
    */
   public void setReadTimeout(int readTimeout) {
-    ObjectUtil.requireNonNull(template);
-    template.setReadTimeout(readTimeout);
+    ObjectUtil.requireNonNull(engine);
+    engine.setReadTimeout(readTimeout);
   }
 
   /**
@@ -45,6 +45,6 @@ public abstract class AbstractFactory {
    */
   public void addRetryStatus(HttpStatus... httpStatuses) {
     ObjectUtil.requireNonNull((Object[]) httpStatuses);
-    template.addRetryStatus(httpStatuses);
+    engine.addRetryStatus(httpStatuses);
   }
 }

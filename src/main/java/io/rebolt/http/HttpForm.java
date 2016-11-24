@@ -68,8 +68,11 @@ public final class HttpForm implements IModel<HttpForm> {
    * Form 문자열로 변환
    */
   public final String toFormString() {
+    if (ObjectUtil.isEmpty(queryMap)) {
+      return STRING_EMPTY;
+    }
     StringBuilder builder = new StringBuilder();
-    ObjectUtil.nullGuard(queryMap).forEach((key, value) -> builder.append(key).append(STRING_EQUAL).append(StringUtil.encodeUrl(value)).append(STRING_AND));
+    queryMap.forEach((key, value) -> builder.append(key).append(STRING_EQUAL).append(StringUtil.encodeUrl(value)).append(STRING_AND));
     return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : STRING_EMPTY;
   }
 

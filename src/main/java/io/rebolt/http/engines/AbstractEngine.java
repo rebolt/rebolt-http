@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 The Rebolt Framework
+ *
+ * The Rebolt Framework licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package io.rebolt.http.engines;
 
 import com.google.common.collect.Lists;
@@ -74,6 +90,8 @@ public abstract class AbstractEngine<RQ, RS, CB> {
 
   /**
    * 요청 객체를 생성한다.
+   *
+   * @since 1.0
    */
   public abstract RQ makeRequest(HttpRequest request);
 
@@ -81,6 +99,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    * 반환 객체를 생성한다.
    *
    * @return {@link HttpResponse} rebolt-http에서 사용하는 반환 객체
+   * @since 1.0
    */
   public abstract HttpResponse makeResponse(RS response);
 
@@ -88,6 +107,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    * 콜백 객체를 생성한다.
    *
    * @param callback {@link HttpCallback} rebolt-http 사용하는 콜백 객체
+   * @since 1.0
    */
   public abstract CB makeCallback(HttpCallback callback);
 
@@ -96,6 +116,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    *
    * @param request 통신엔진에서 사용하는 Request 인스턴스
    * @return 통신엔진에서 사용하는 Response 인스턴스
+   * @since 1.0
    */
   public abstract RS invoke(RQ request);
 
@@ -104,6 +125,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    *
    * @param request 통신엔진에서 사용하는 Request 인스턴스
    * @param callback 통신엔진에서 사용하는 Callback 인스턴스
+   * @since 1.0
    */
   public abstract void invokeAsync(RQ request, CB callback);
 }

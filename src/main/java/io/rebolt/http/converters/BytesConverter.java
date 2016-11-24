@@ -18,20 +18,13 @@ package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.rebolt.http.HttpForm;
-import io.rebolt.http.HttpHeader;
 
 /**
- * Http 프로토콜위에 페이로드되는 사용자 프로토콜 컨버터
- * <p>
- * {@link Converter}에서 제공하는 인터페이스 스펙을 구현하면
- * 사용자 프로토콜 컨버터를 손쉽게 추가해서 사용할 수 있다.
+ * 엔진에서 사용하는 페이로드를 byte[]로 사용하는 컨버터
  *
  * @param <Request> 페이로드된 요청 프로토콜 ({@link HttpForm}, {@link JsonNode}, {@link String}, ...)
- * @param <Raw> 통신엔진에서 사용할 프로토콜 (<u>byte[]</u>, {@link String})
  * @param <Response> 페이로드된 응답 프로토콜 (html, {@link JsonNode}, {@link String}, ...)
  * @since 1.0
  */
-public interface Converter<Request, Raw, Response> {
-  Raw convertRequest(Request request);
-  Response convertResponse(Raw rawResponse);
+public interface BytesConverter<Request, Response> extends Converter<Request, byte[], Response> {
 }

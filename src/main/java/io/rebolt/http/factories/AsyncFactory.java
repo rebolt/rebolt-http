@@ -24,7 +24,7 @@ public final class AsyncFactory extends AbstractFactory {
   private @Getter ExecutorService threadPool;
 
   public AsyncFactory(Class<? extends AbstractEngine> templateClass) {
-    super.setTemplate(ClassUtil.newInstance(templateClass));
+    super.setEngine(ClassUtil.newInstance(templateClass));
   }
 
   public void setThreadPool(final ExecutorService threadPool) {
@@ -50,8 +50,8 @@ public final class AsyncFactory extends AbstractFactory {
    */
   @SuppressWarnings("unchecked")
   public <Q, R> void invoke(HttpRequest<Q> request, HttpCallback<R> callback) {
-    Objects.requireNonNull(template);
-    template.invokeAsync(template.makeRequest(request), template.makeCallback(callback));
+    Objects.requireNonNull(engine);
+    engine.invokeAsync(engine.makeRequest(request), engine.makeCallback(callback));
   }
 
 }
