@@ -1,9 +1,16 @@
 package io.rebolt.http.factories;
 
+import io.rebolt.core.utils.ClassUtil;
 import io.rebolt.http.HttpCallback;
 import io.rebolt.http.HttpRequest;
+import io.rebolt.http.HttpResponse;
+import io.rebolt.http.executors.LinkedBlockingThreadExecutor;
+import io.rebolt.http.executors.SimpleThreadFactory;
+import io.rebolt.http.engines.AbstractEngine;
+import lombok.Getter;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
 /**
  * AsyncFactory
@@ -14,25 +21,37 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public final class AsyncFactory extends AbstractFactory {
 
-  /**
-   * 스레드풀을 사용한다.
-   */
-  private ThreadPoolExecutor threadPool;
+  private @Getter ExecutorService threadPool;
 
-  public AsyncFactory() {
-    this.threadPool = null; // 기본 ThreadPool
+  public AsyncFactory(Class<? extends AbstractEngine> templateClass) {
+    super.setTemplate(ClassUtil.newInstance(templateClass));
   }
 
-  public AsyncFactory(ThreadPoolExecutor threadPool) {
+  public void setThreadPool(final ExecutorService threadPool) {
     this.threadPool = threadPool;
   }
 
-  protected ThreadPoolExecutor getThreadPool() {
-    return threadPool;
+  public void setThreadPool(int maxThread, int threadIdleMillis, int maxQueue) {
+    this.threadPool = new LinkedBlockingThreadExecutor.Builder()
+        .setThreadCount(maxThread)
+        .setThreadFactory(new SimpleThreadFactory())
+        .setThreadIdleTime(threadIdleMillis)
+        .setLinkedBlockingQueue(maxQueue).build();
   }
 
+  /**
+   * 비동기요청
+   *
+   * @param request 요청객체
+   * @param callback 콜백 {@link HttpCallback}
+   * @param <Q> 페이로드 요청 클래스
+   * @param <R> 페이로드 콜백 클래스 (내부에 응답 클래스 {@link HttpResponse})
+   * @since 1.0
+   */
+  @SuppressWarnings("unchecked")
   public <Q, R> void invoke(HttpRequest<Q> request, HttpCallback<R> callback) {
-
+    Objects.requireNonNull(template);
+    template.invokeAsync(template.makeRequest(request), template.makeCallback(callback));
   }
 
 }

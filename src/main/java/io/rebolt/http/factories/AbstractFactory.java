@@ -1,7 +1,8 @@
 package io.rebolt.http.factories;
 
 import io.rebolt.core.utils.ObjectUtil;
-import io.rebolt.http.templates.AbstractTemplate;
+import io.rebolt.http.HttpStatus;
+import io.rebolt.http.engines.AbstractEngine;
 
 /**
  * 요청 팩토리
@@ -10,14 +11,14 @@ import io.rebolt.http.templates.AbstractTemplate;
  */
 public abstract class AbstractFactory {
 
-  protected AbstractTemplate template;
+  protected AbstractEngine template;
 
   /**
    * 통신엔진 설정
    *
-   * @param template {@link AbstractTemplate}
+   * @param template {@link AbstractEngine}
    */
-  protected void setTemplate(AbstractTemplate template) {
+  protected void setTemplate(AbstractEngine template) {
     this.template = template;
   }
 
@@ -35,5 +36,15 @@ public abstract class AbstractFactory {
   public void setReadTimeout(int readTimeout) {
     ObjectUtil.requireNonNull(template);
     template.setReadTimeout(readTimeout);
+  }
+
+  /**
+   * 재시도 조건 추가
+   *
+   * @param httpStatuses {@link HttpStatus}
+   */
+  public void addRetryStatus(HttpStatus... httpStatuses) {
+    ObjectUtil.requireNonNull((Object[]) httpStatuses);
+    template.addRetryStatus(httpStatuses);
   }
 }

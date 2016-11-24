@@ -1,5 +1,6 @@
 package io.rebolt.http;
 
+import com.google.common.net.MediaType;
 import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.StringUtil;
@@ -37,6 +38,26 @@ public final class HttpRequest<T> implements IModel<HttpRequest> {
 
   public HttpRequest<T> method(HttpMethod method) {
     this.method = method;
+    return this;
+  }
+
+  public HttpRequest<T> accept(MediaType accept) {
+    this.header.addAccept(accept);
+    return this;
+  }
+
+  public HttpRequest<T> accept(String accept) {
+    this.header.addAccept(accept);
+    return this;
+  }
+
+  public HttpRequest<T> contentType(MediaType contentType) {
+    this.header.addContentType(contentType);
+    return this;
+  }
+
+  public HttpRequest<T> contentType(String contentType) {
+    this.header.addContentType(contentType);
     return this;
   }
 

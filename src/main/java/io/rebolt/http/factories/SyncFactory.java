@@ -3,7 +3,9 @@ package io.rebolt.http.factories;
 import io.rebolt.core.utils.ClassUtil;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
-import io.rebolt.http.templates.AbstractTemplate;
+import io.rebolt.http.engines.AbstractEngine;
+
+import java.util.Objects;
 
 /**
  * SyncFactory
@@ -14,7 +16,7 @@ import io.rebolt.http.templates.AbstractTemplate;
  */
 public final class SyncFactory extends AbstractFactory {
 
-  public SyncFactory(Class<? extends AbstractTemplate> templateClass) {
+  public SyncFactory(Class<? extends AbstractEngine> templateClass) {
     super.setTemplate(ClassUtil.newInstance(templateClass));
   }
 
@@ -25,9 +27,11 @@ public final class SyncFactory extends AbstractFactory {
    * @param <Q> 페이로드 요청클래스
    * @param <R> 페이로드 응답클래스
    * @return {@link HttpResponse}
+   * @since 1.0
    */
   @SuppressWarnings("unchecked")
   public <Q, R> HttpResponse<R> invoke(HttpRequest<Q> httpRequest) {
-    return template.makeResponse(template.invokeInternal(template.makeRequest(httpRequest)));
+    Objects.requireNonNull(template);
+    return (HttpResponse<R>) template.makeResponse(template.invoke(template.makeRequest(httpRequest)));
   }
 }
