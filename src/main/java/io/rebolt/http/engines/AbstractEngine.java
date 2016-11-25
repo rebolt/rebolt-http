@@ -72,6 +72,20 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   private @Getter @Setter int readTimeout = 5000;
 
   /**
+   * 커넥션풀의 최대 대기 수 (통신엔진에 따라 적용여부 달라짐)
+   * <p>
+   * 기본값 : 10
+   */
+  private @Getter @Setter int connectionPoolMaxIdleCount = 10;
+
+  /**
+   * 커넥션풀의 Keep Alive 주가
+   * <p>
+   * 기본값 : 2,000 milliseconds
+   */
+  private @Getter @Setter int connectionPoolKeepAliveDuration = 2000;
+
+  /**
    * 재시도 {@link HttpStatus} 정의
    * <p>
    * 기본값 : 408 (Request timeout), 429 (Too many requests), 504 (Gateway timeout)

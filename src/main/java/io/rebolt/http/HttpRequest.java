@@ -125,6 +125,19 @@ public final class HttpRequest implements IModel<HttpRequest> {
     return this;
   }
 
+  /**
+   * 목적지의 Endpoint를 가져온다.
+   *
+   * @since 1.0
+   */
+  public String getEndpointUri() {
+    StringBuilder endpoint = new StringBuilder();
+    endpoint.append(url);
+    ObjectUtil.thenNonEmpty(path, endpoint::append);
+    //ObjectUtil.thenNonEmpty(form, (HttpForm form) -> endpoint.append(form.toFormString()));
+    return endpoint.toString();
+  }
+
   @Override
   public boolean isEmpty() {
     return ObjectUtil.isOrNull(method, body) || ObjectUtil.isEmpty(url);
