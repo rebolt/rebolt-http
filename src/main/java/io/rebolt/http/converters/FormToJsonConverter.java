@@ -32,7 +32,7 @@ import static io.rebolt.core.constants.Constants.CHARSET_UTF8;
  * ContentType: "application/x-www-form-urlencoded;charset=utf-8"
  * Accept: "application/json;charset=utf-8"
  */
-public final class HttpFormToJsonConverter implements BytesConverter<HttpForm, JsonNode> {
+final class FormToJsonConverter implements BytesConverter<HttpForm, JsonNode> {
   @Override
   public byte[] convertRequest(HttpForm httpForm) {
     if (ObjectUtil.isNull(httpForm)) {

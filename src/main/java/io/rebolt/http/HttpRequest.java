@@ -1,74 +1,138 @@
+/*
+ * Copyright 2016 The Rebolt Framework
+ *
+ * The Rebolt Framework licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package io.rebolt.http;
 
 import com.google.common.net.MediaType;
 import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
-import io.rebolt.core.utils.StringUtil;
+import io.rebolt.core.utils.ObjectUtil;
+import io.rebolt.http.converters.Converter;
+import io.rebolt.http.converters.ConverterTable;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Objects;
+import static io.rebolt.http.HttpMethod.Get;
 
 /**
  * HttpRequest
- * <p>
- * Http 요청을 하기 위해서는 {@link HttpRequest} 인스턴스를 생성한다.
+ *
+ * @since 1.0
  */
 @ToString
-public final class HttpRequest<T> implements IModel<HttpRequest> {
+public final class HttpRequest implements IModel<HttpRequest> {
   private static final long serialVersionUID = -8573892752367366044L;
+  private final @Getter Converter converter;
   private @Getter HttpHeader header;
   private @Getter HttpMethod method;
-  private @Getter String uri;
-  private @Getter T body;
+  private @Getter String url;
+  private @Getter String path;
+  private @Getter HttpForm form;
+  private @Getter Object body;
 
-  public static <T> HttpRequest<T> create() {
-    return new HttpRequest<>();
+  public static HttpRequest create() {
+    return new HttpRequest();
+  }
+
+  public static HttpRequest create(Class<?> responseType) {
+    return new HttpRequest(responseType);
+  }
+
+  public static HttpRequest create(Class<?> requestType, Class<?> responseType) {
+    return new HttpRequest(requestType, responseType);
   }
 
   private HttpRequest() {
-    this.header = HttpHeader.create();
-    this.method = HttpMethod.Get;
+    this(void.class, String.class);
   }
 
-  public HttpRequest<T> header(HttpHeader header) {
+  private HttpRequest(Class<?> responseType) {
+    this(void.class, responseType);
+  }
+
+  private HttpRequest(Class<?> requestType, Class<?> responseType) {
+    this.header = HttpHeader.create();
+    this.method = Get;
+    this.converter = ConverterTable.get(requestType, responseType);
+  }
+
+  public HttpRequest header(HttpHeader header) {
     this.header = header;
     return this;
   }
 
-  public HttpRequest<T> method(HttpMethod method) {
+  public HttpRequest method(HttpMethod method) {
     this.method = method;
     return this;
   }
 
-  public HttpRequest<T> accept(MediaType accept) {
+  public HttpRequest accept(MediaType accept) {
     this.header.addAccept(accept);
     return this;
   }
 
-  public HttpRequest<T> accept(String accept) {
+  public HttpRequest accept(String accept) {
     this.header.addAccept(accept);
     return this;
   }
 
-  public HttpRequest<T> contentType(MediaType contentType) {
+  public HttpRequest contentType(MediaType contentType) {
     this.header.addContentType(contentType);
     return this;
   }
 
-  public HttpRequest<T> contentType(String contentType) {
+  public HttpRequest contentType(String contentType) {
     this.header.addContentType(contentType);
+    return this;
+  }
+
+  public HttpRequest url(String url) {
+    this.url = url;
+    return this;
+  }
+
+  public HttpRequest path(String path) {
+    this.path = path;
+    return this;
+  }
+
+  public HttpRequest form(HttpForm form) {
+    if (!Get.equals(method)) {
+      this.body = form;
+    } else {
+      this.form = form;
+    }
+    return this;
+  }
+
+  public HttpRequest body(Object body) {
+    if (!Get.equals(method)) {
+      this.body = body;
+    }
     return this;
   }
 
   @Override
   public boolean isEmpty() {
-    return Objects.isNull(method) || Objects.isNull(body) || StringUtil.isNullOrEmpty(uri);
+    return ObjectUtil.isOrNull(method, body) || ObjectUtil.isEmpty(url);
   }
 
   @Override
   public long deepHash() {
-    return HashUtil.deepHash(header, method, uri, body);
+    return HashUtil.deepHash(header, method, url, body);
   }
 
   @Override

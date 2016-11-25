@@ -18,7 +18,6 @@ package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.rebolt.http.HttpForm;
-import io.rebolt.http.HttpHeader;
 
 /**
  * Http 프로토콜위에 페이로드되는 사용자 프로토콜 컨버터

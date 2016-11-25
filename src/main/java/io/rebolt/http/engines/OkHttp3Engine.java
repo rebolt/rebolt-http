@@ -24,11 +24,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * OkHttp3 템플릿
+ * OkHttp3 통신엔진
  *
  * @since 1.0
  */
-public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
+final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
 
   @Override
   public Request makeRequest(HttpRequest request) {

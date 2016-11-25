@@ -16,21 +16,37 @@
 
 package io.rebolt.http.converters;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
+
+import java.io.IOException;
 
 import static io.rebolt.core.constants.Constants.CHARSET_UTF8;
 
 /**
- * {@link String} to {@link String} 컨버터
+ * {@link String} to {@link JsonNode} 컨버터
+ *
+ * ContentType: "application/x-www-form-urlencoded;charset=utf-8"
+ * Accept: "application/json;charset=utf-8"
  */
-final class StringConverter implements BytesConverter<String, String> {
+final class StringToJsonConverter implements BytesConverter<String, JsonNode> {
   @Override
   public byte[] convertRequest(String request) {
     return ObjectUtil.isNull(request) ? new byte[0] : request.getBytes(CHARSET_UTF8);
   }
 
   @Override
-  public String convertResponse(byte[] rawResponse) {
-    return ObjectUtil.isNull(rawResponse) ? null : new String(rawResponse, CHARSET_UTF8);
+  public JsonNode convertResponse(byte[] rawResponse) {
+    if (ObjectUtil.isNull(rawResponse)) {
+      return null;
+    }
+    try {
+      return new ObjectMapper().readTree(rawResponse);
+    } catch (IOException e) {
+      LogUtil.warn(e);
+      return null;
+    }
   }
 }

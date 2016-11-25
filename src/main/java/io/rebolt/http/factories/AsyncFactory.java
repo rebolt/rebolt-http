@@ -13,9 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
 /**
- * AsyncFactory
- * <p>
- * 비동기 패턴을 사용하는 {@link AbstractFactory} 추상 클래스
+ * 비동기패턴 클라이언트 팩토리
  *
  * @since 1.0
  */
@@ -44,12 +42,11 @@ public final class AsyncFactory extends AbstractFactory {
    *
    * @param request 요청객체
    * @param callback 콜백 {@link HttpCallback}
-   * @param <Q> 페이로드 요청 클래스
-   * @param <R> 페이로드 콜백 클래스 (내부에 응답 클래스 {@link HttpResponse})
+   * @param <R> 페이로드 콜백 클래스 (내부에 응답 클래스 포함 : {@link HttpResponse})
    * @since 1.0
    */
   @SuppressWarnings("unchecked")
-  public <Q, R> void invoke(HttpRequest<Q> request, HttpCallback<R> callback) {
+  public <R> void invoke(HttpRequest request, HttpCallback<R> callback) {
     Objects.requireNonNull(engine);
     engine.invokeAsync(engine.makeRequest(request), engine.makeCallback(callback));
   }

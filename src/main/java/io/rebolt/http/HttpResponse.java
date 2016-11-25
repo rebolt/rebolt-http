@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016 The Rebolt Framework
+ *
+ * The Rebolt Framework licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
 package io.rebolt.http;
 
 import io.rebolt.core.models.IModel;
@@ -10,15 +26,16 @@ import lombok.ToString;
 
 /**
  * HttpResponse
- * <p>
- * {@link HttpRequest} 전달시 반환받는 응답 객체
+ *
+ * @param <R> 응답 클래스
+ * @since 1.0
  */
 @ToString
-public final class HttpResponse<T> implements IModel<HttpResponse> {
+public final class HttpResponse<R> implements IModel<HttpResponse> {
   private static final long serialVersionUID = 7879572529075814407L;
   private @Getter @Setter HttpStatus status;
   private @Getter @Setter HttpHeader header;
-  private @Getter @Setter T body;
+  private @Getter @Setter R body;
   /**
    * 요청에 대한 예상되지 않은 에러가 발생했을 때 {@link HttpException} 객체가 생성된다.
    * 정상적으로 데이터를 주고 받았을 때에는 null로 정의된다.
@@ -28,7 +45,7 @@ public final class HttpResponse<T> implements IModel<HttpResponse> {
 
   public HttpResponse() {}
 
-  public HttpResponse(HttpStatus status, HttpHeader header, T body) {
+  public HttpResponse(HttpStatus status, HttpHeader header, R body) {
     this.status = status;
     this.header = header;
     this.body = body;
