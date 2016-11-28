@@ -5,9 +5,11 @@ import com.google.common.net.MediaType;
 import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.ObjectUtil;
+import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.rebolt.http.HttpHeader.Header.Accept;
@@ -17,31 +19,42 @@ import static io.rebolt.http.HttpHeader.Header.UserAgent;
 @ToString
 public final class HttpHeader implements IModel<HttpHeader> {
   private static final long serialVersionUID = 576771757645112134L;
-  private @Getter Map<String, String> headers;
+  private @Getter Map<String, String> headerMap;
 
   /**
-   * HttpHeader 생성 (기본값 포함)
+   * HttpHeader 생성 (기본값 포함, 요청용)
    * <p>
-   * User-Agent : Rebolt HttpClient
+   * User-Agent : Rebolt-Http/(version) (RFC 7231: https://tools.ietf.org/html/rfc7231#section-5.5.3)
    * Content-Type : FORM DATA
    * Accept : PLAIN TEXT (UTF-8)
+   * <p>
    *
    * @return {@link HttpHeader}
-   * @since 0.1.0
+   * @since 1.0
    */
   public static HttpHeader create() {
     return new HttpHeader()
-        .add(UserAgent, "Rebolt HttpClient")
+        .add(UserAgent, "Rebolt-Http/1.0")
         .add(ContentType, MediaType.FORM_DATA)
         .add(Accept, MediaType.PLAIN_TEXT_UTF_8);
   }
 
+  /**
+   * HttpHEader 생성 (기본값 없음, 응답용)
+   *
+   * @return {@link HttpHeader}
+   * @since 1.0
+   */
+  public static HttpHeader createForResponse() {
+    return new HttpHeader();
+  }
+
   private HttpHeader() {
-    this.headers = Maps.newHashMap();
+    this.headerMap = Maps.newHashMap();
   }
 
   public HttpHeader add(String header, String value) {
-    headers.put(header, value);
+    headerMap.put(header, value);
     return this;
   }
 
@@ -55,6 +68,11 @@ public final class HttpHeader implements IModel<HttpHeader> {
 
   public HttpHeader add(Header header, String value) {
     return add(header.getHeader(), value);
+  }
+
+  public HttpHeader add(String header, List<String> values) {
+    headerMap.put(header, StringUtil.join("; ", values));
+    return this;
   }
 
   public HttpHeader addAccept(String accept) {
@@ -74,34 +92,34 @@ public final class HttpHeader implements IModel<HttpHeader> {
   }
 
   public String get(String header) {
-    return headers.get(header);
+    return headerMap.get(header);
   }
 
   public String get(Header header) {
-    return headers.get(header.getHeader());
+    return headerMap.get(header.getHeader());
   }
 
   public String getAccept() {
-    return headers.get(Header.Accept.getHeader());
+    return headerMap.get(Header.Accept.getHeader());
   }
 
   public String getContentType() {
-    return headers.get(Header.ContentType.getHeader());
+    return headerMap.get(Header.ContentType.getHeader());
   }
 
   @Override
   public boolean isEmpty() {
-    return ObjectUtil.isEmpty(headers);
-}
+    return ObjectUtil.isEmpty(headerMap);
+  }
 
   @Override
   public long deepHash() {
-    return HashUtil.deepHash(headers);
+    return HashUtil.deepHash(headerMap);
   }
 
   @Override
   public boolean equals(HttpHeader httpHeader) {
-    return headers.hashCode() == httpHeader.hashCode();
+    return headerMap.hashCode() == httpHeader.hashCode();
   }
 
   /**
@@ -121,14 +139,14 @@ public final class HttpHeader implements IModel<HttpHeader> {
     }
 
     public static Header lookup(String header) {
-      return headerMap.get(header);
+      return _headerMap.get(header);
     }
 
-    private static final Map<String, Header> headerMap = Maps.newHashMap();
+    private static final Map<String, Header> _headerMap = Maps.newHashMap();
 
     static {
       for (Header entry : HttpHeader.Header.values()) {
-        headerMap.put(entry.getHeader(), entry);
+        _headerMap.put(entry.getHeader(), entry);
       }
     }
   }

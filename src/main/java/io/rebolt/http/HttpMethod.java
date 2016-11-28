@@ -15,8 +15,8 @@ public enum HttpMethod {
   Post("post"),
   Delete("delete"),
   Put("put"),
-  Trace("trace"),
-  Option("option");
+  Patch("patch"),
+  Head("head");
 
   private final @Getter String method;
 

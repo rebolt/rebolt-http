@@ -16,17 +16,22 @@
 
 package io.rebolt.http.engines;
 
+import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpCallback;
+import io.rebolt.http.HttpHeader;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
 import io.rebolt.http.factories.AbstractFactory;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,6 +41,9 @@ import java.util.concurrent.TimeUnit;
  */
 final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
 
+  /**
+   *
+   */
   private OkHttpClient client;
   private final Object _lock = new Object();
 
@@ -58,18 +66,67 @@ final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
     }
   }
 
+  /**
+   * @param httpRequest {@link HttpRequest}
+   * @return {@link Request} Okhttp3 에서 사용하는 요청 객체
+   * @since 1.0
+   */
   @Override
-  public Request makeRequest(HttpRequest request) {
+  public Request makeRequest(HttpRequest httpRequest) {
     Request.Builder builder = new Request.Builder();
     // step 1 : header
-    ObjectUtil.nullGuard(request.getHeader().getHeaders()).forEach(builder::addHeader);
+    ObjectUtil.nullGuard(httpRequest.getHeader().getHeaderMap()).forEach(builder::addHeader);
     // step 2 : url and path and query
-    return null;
+    builder.url(httpRequest.getEndpointUri());
+    // step 3 : body - 별도의 Null 체크를 하지 않는 이유는 Null Body도 허용하기 위함
+    //noinspection unchecked
+    byte[] bodyBytes = (byte[]) httpRequest.getConverter().convertRequest(httpRequest.getBody());
+    RequestBody body = RequestBody.create(MediaType.parse(httpRequest.getHeader().getContentType()), bodyBytes);
+    // step 4 : method
+    switch (httpRequest.getMethod()) {
+      case Get:
+      default:
+        builder.get();
+        break;
+      case Head:
+        builder.head();
+        break;
+      case Post:
+        builder.post(body);
+        break;
+      case Put:
+        builder.put(body);
+        break;
+      case Delete:
+        if (ObjectUtil.isEmpty(bodyBytes)) {
+          builder.delete();
+        } else {
+          builder.delete(body);
+        }
+        break;
+      case Patch:
+        builder.patch(body);
+        break;
+    }
+    return builder.build();
   }
 
   @Override
-  public HttpResponse makeResponse(Response response) {
-    return null;
+  public HttpResponse makeResponse(HttpRequest httpRequest, Response response) {
+    // step 1 : header
+    HttpHeader header = HttpHeader.createForResponse();
+    ObjectUtil.nullGuard(response.headers().toMultimap()).forEach(header::add);
+    // step 2 : response
+    byte[] responseBytes = null;
+    try {
+      responseBytes = response.body().bytes();
+    } catch (IOException ex) {
+      LogUtil.warn(ex);
+    }
+    //noinspection unchecked
+    Object responseObject = httpRequest.getConverter().convertResponse(responseBytes);
+    //noinspection unchecked
+    return new HttpResponse(response.code(), header, responseObject);
   }
 
   @Override

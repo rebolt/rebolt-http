@@ -17,11 +17,11 @@
 package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import io.rebolt.core.exceptions.NotSupportedException;
+import com.google.common.collect.Maps;
 import io.rebolt.core.utils.ClassUtil;
 import io.rebolt.http.HttpForm;
+
+import java.util.Map;
 
 /**
  * rebolt-http에서 제공하는 기본 {@link Converter} 목록
@@ -30,7 +30,12 @@ import io.rebolt.http.HttpForm;
  * @since 1.0
  */
 public final class ConverterTable {
-  private static final Table<Class, Class, Converter> converterTable = HashBasedTable.create();
+  /**
+   * 이중 Map
+   * <p>
+   * Guava에서 제공하는 Table보다는 이중 Map으로 구성하는 것이 속도면에서 유리하다.
+   */
+  private static final Map<Class, Map<Class, Converter>> converterTable = Maps.newHashMap();
 
   static {
     /**
@@ -64,8 +69,16 @@ public final class ConverterTable {
    * @param converterType 컨버터타입
    * @since 1.0
    */
-  public static void add(Class<?> requestType, Class<?> responseType, Class<? extends Converter> converterType) {
-    converterTable.put(requestType, responseType, ClassUtil.getSingleton(converterType));
+  public static synchronized void add(Class<?> requestType, Class<?> responseType, Class<? extends Converter> converterType) {
+    Map<Class, Converter> converterMap = converterTable.get(requestType);
+    if (converterMap == null) {
+      converterMap = Maps.newHashMap();
+      converterMap.put(responseType, ClassUtil.newInstance(converterType));
+      converterTable.put(requestType, converterMap);
+    } else {
+      // 존재한다면 덮어쓴다.
+      converterMap.put(responseType, ClassUtil.newInstance(converterType));
+    }
   }
 
   /**
@@ -76,10 +89,10 @@ public final class ConverterTable {
    * @since 1.0
    */
   public static Converter get(Class<?> requestType, Class<?> responseType) {
-    Converter converter = converterTable.get(requestType, responseType);
-    if (converter == null) {
-      throw new NotSupportedException("not supported request, response type: " + requestType + ", " + responseType);
+    Map<Class, Converter> converterMap = converterTable.get(requestType);
+    if (converterMap == null) {
+      return null;
     }
-    return converter;
+    return converterMap.get(responseType);
   }
 }

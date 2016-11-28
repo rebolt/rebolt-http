@@ -35,7 +35,7 @@ import static io.rebolt.http.HttpMethod.Get;
 @ToString
 public final class HttpRequest implements IModel<HttpRequest> {
   private static final long serialVersionUID = -8573892752367366044L;
-  private final @Getter Converter converter;
+  private final Converter converter;
   private @Getter HttpHeader header;
   private @Getter HttpMethod method;
   private @Getter String url;
@@ -68,6 +68,8 @@ public final class HttpRequest implements IModel<HttpRequest> {
     this.method = Get;
     this.converter = ConverterTable.get(requestType, responseType);
   }
+
+  // region builders
 
   public HttpRequest header(HttpHeader header) {
     this.header = header;
@@ -125,8 +127,11 @@ public final class HttpRequest implements IModel<HttpRequest> {
     return this;
   }
 
+  // endregion
+
   /**
    * 목적지의 Endpoint를 가져온다.
+   * 만약 {@link HttpMethod}가 Get방식이고, {@link HttpForm}이 추가되었다면 QueryString으로 사용한다.
    *
    * @since 1.0
    */
@@ -134,8 +139,16 @@ public final class HttpRequest implements IModel<HttpRequest> {
     StringBuilder endpoint = new StringBuilder();
     endpoint.append(url);
     ObjectUtil.thenNonEmpty(path, endpoint::append);
-    //ObjectUtil.thenNonEmpty(form, (HttpForm form) -> endpoint.append(form.toFormString()));
+    ObjectUtil.thenNonEmpty(form, form -> endpoint.append("?").append(form.toFormString()));
     return endpoint.toString();
+  }
+
+  public Converter getConverter() {
+    return converter;
+  }
+
+  public boolean isBody() {
+    return !ObjectUtil.isNull(body);
   }
 
   @Override

@@ -45,8 +45,8 @@ public final class HttpResponse<R> implements IModel<HttpResponse> {
 
   public HttpResponse() {}
 
-  public HttpResponse(HttpStatus status, HttpHeader header, R body) {
-    this.status = status;
+  public HttpResponse(int status, HttpHeader header, R body) {
+    this.status = HttpStatus.lookup(status);
     this.header = header;
     this.body = body;
   }

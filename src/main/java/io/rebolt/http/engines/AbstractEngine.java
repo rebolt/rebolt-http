@@ -115,7 +115,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    * @return {@link HttpResponse} rebolt-http에서 사용하는 반환 객체
    * @since 1.0
    */
-  public abstract HttpResponse makeResponse(RS response);
+  public abstract HttpResponse makeResponse(HttpRequest request, RS response);
 
   /**
    * 콜백 객체를 생성한다.
