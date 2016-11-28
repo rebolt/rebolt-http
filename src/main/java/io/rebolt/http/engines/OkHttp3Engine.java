@@ -20,6 +20,7 @@ import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpCallback;
 import io.rebolt.http.HttpHeader;
+import io.rebolt.http.HttpMethod;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
 import io.rebolt.http.factories.AbstractFactory;
@@ -32,14 +33,16 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+
+import static io.rebolt.http.HttpMethod.Get;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * OkHttp3 통신엔진
  *
  * @since 1.0
  */
-final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
+public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
 
   /**
    *
@@ -52,18 +55,20 @@ final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
    *
    * @since 1.0
    */
-  private void makeClient() {
+  private OkHttpClient getClient() {
     if (client == null) {
       synchronized (_lock) {
         if (client == null) {
           client = new OkHttpClient.Builder()
-              .connectTimeout(getConnectionTimeout(), TimeUnit.MICROSECONDS)
-              .readTimeout(getReadTimeout(), TimeUnit.MICROSECONDS)
-              .connectionPool(new ConnectionPool(getConnectionPoolMaxIdleCount(), getConnectionPoolKeepAliveDuration(), TimeUnit.MILLISECONDS))
+              .connectTimeout(getConnectionTimeout(), MILLISECONDS)
+              .readTimeout(getReadTimeout(), MILLISECONDS)
+              .writeTimeout(getWriteTimeout(), MILLISECONDS)
+              .connectionPool(new ConnectionPool(getConnectionPoolMaxIdleCount(), getConnectionPoolKeepAliveDuration(), MILLISECONDS))
               .build();
         }
       }
     }
+    return client;
   }
 
   /**
@@ -79,34 +84,38 @@ final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
     // step 2 : url and path and query
     builder.url(httpRequest.getEndpointUri());
     // step 3 : body - 별도의 Null 체크를 하지 않는 이유는 Null Body도 허용하기 위함
-    //noinspection unchecked
-    byte[] bodyBytes = (byte[]) httpRequest.getConverter().convertRequest(httpRequest.getBody());
-    RequestBody body = RequestBody.create(MediaType.parse(httpRequest.getHeader().getContentType()), bodyBytes);
+    HttpMethod method = httpRequest.getMethod();
     // step 4 : method
-    switch (httpRequest.getMethod()) {
-      case Get:
-      default:
-        builder.get();
-        break;
-      case Head:
-        builder.head();
-        break;
-      case Post:
-        builder.post(body);
-        break;
-      case Put:
-        builder.put(body);
-        break;
-      case Delete:
-        if (ObjectUtil.isEmpty(bodyBytes)) {
-          builder.delete();
-        } else {
-          builder.delete(body);
-        }
-        break;
-      case Patch:
-        builder.patch(body);
-        break;
+    if (method.equals(Get)) {
+      builder.get();
+    } else {
+      @SuppressWarnings("unchecked")
+      byte[] bodyBytes = (byte[]) httpRequest.getConverter().convertRequest(httpRequest.getBody());
+      RequestBody body = RequestBody.create(MediaType.parse(httpRequest.getHeader().getContentType()), bodyBytes);
+      switch (method) {
+        default:
+          builder.get();
+          break;
+        case Head:
+          builder.head();
+          break;
+        case Post:
+          builder.post(body);
+          break;
+        case Put:
+          builder.put(body);
+          break;
+        case Delete:
+          if (ObjectUtil.isEmpty(bodyBytes)) {
+            builder.delete();
+          } else {
+            builder.delete(body);
+          }
+          break;
+        case Patch:
+          builder.patch(body);
+          break;
+      }
     }
     return builder.build();
   }
@@ -136,12 +145,16 @@ final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
 
   @Override
   public Response invoke(Request request) {
-    makeClient();
-    return null;
+    try {
+      return getClient().newCall(request).execute();
+    } catch (IOException ex) {
+      LogUtil.warn(ex);
+      return null;
+    }
   }
 
   @Override
   public void invokeAsync(Request request, Callback callback) {
-    makeClient();
+    getClient();
   }
 }

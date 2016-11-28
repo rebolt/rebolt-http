@@ -78,6 +78,9 @@ public final class HttpRequest implements IModel<HttpRequest> {
 
   public HttpRequest method(HttpMethod method) {
     this.method = method;
+    if (!method.equals(Get) && ObjectUtil.isEmpty(header.getContentType())) {
+      header.addContentType(MediaType.FORM_DATA);
+    }
     return this;
   }
 

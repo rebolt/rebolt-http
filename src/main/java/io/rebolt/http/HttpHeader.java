@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import static io.rebolt.http.HttpHeader.Header.Accept;
-import static io.rebolt.http.HttpHeader.Header.ContentType;
 import static io.rebolt.http.HttpHeader.Header.UserAgent;
 
 @ToString
@@ -35,7 +34,6 @@ public final class HttpHeader implements IModel<HttpHeader> {
   public static HttpHeader create() {
     return new HttpHeader()
         .add(UserAgent, "Rebolt-Http/1.0")
-        .add(ContentType, MediaType.FORM_DATA)
         .add(Accept, MediaType.PLAIN_TEXT_UTF_8);
   }
 

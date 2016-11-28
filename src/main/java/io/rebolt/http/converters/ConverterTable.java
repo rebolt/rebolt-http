@@ -58,7 +58,6 @@ public final class ConverterTable {
      * {@link StringToJsonConverter}
      */
     add(String.class, JsonNode.class, StringToJsonConverter.class);
-    add(void.class, String.class, StringToJsonConverter.class);
   }
 
   /**

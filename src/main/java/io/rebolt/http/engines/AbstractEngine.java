@@ -72,6 +72,13 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   private @Getter @Setter int readTimeout = 5000;
 
   /**
+   * 커넥션 후, 데이터송신 타임아웃 설정
+   *
+   * 기본값 : 5,000 milliseconds
+   */
+  private @Getter @Setter int writeTimeout = 5000;
+
+  /**
    * 커넥션풀의 최대 대기 수 (통신엔진에 따라 적용여부 달라짐)
    * <p>
    * 기본값 : 10
