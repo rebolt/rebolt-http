@@ -26,9 +26,9 @@ public final class SyncFactory extends AbstractFactory {
    * @return {@link HttpResponse}
    * @since 1.0
    */
-  @SuppressWarnings("unchecked")
-  public <R> HttpResponse invoke(HttpRequest httpRequest) {
+  public <R> HttpResponse<R> invoke(HttpRequest httpRequest) {
     Objects.requireNonNull(engine);
-    return (HttpResponse<R>) engine.makeResponse(engine.invoke(engine.makeRequest(httpRequest)));
+    //noinspection unchecked
+    return (HttpResponse<R>) engine.makeResponse(httpRequest, engine.invoke(engine.makeRequest(httpRequest)));
   }
 }

@@ -23,6 +23,8 @@ import io.rebolt.http.HttpHeader;
 import io.rebolt.http.HttpMethod;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
+import io.rebolt.http.HttpStatus;
+import io.rebolt.http.exceptions.HttpException;
 import io.rebolt.http.factories.AbstractFactory;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
@@ -72,6 +74,8 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
   }
 
   /**
+   * 통신엔진용 요청객체 생성
+   *
    * @param httpRequest {@link HttpRequest}
    * @return {@link Request} Okhttp3 에서 사용하는 요청 객체
    * @since 1.0
@@ -145,12 +149,35 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
 
   @Override
   public Response invoke(Request request) {
-    try {
-      return getClient().newCall(request).execute();
-    } catch (IOException ex) {
-      LogUtil.warn(ex);
-      return null;
+    return invokeInternal(request, getRetryCount());
+  }
+
+  /**
+   * 재시도횟수(Retry count)가 포함된 요청
+   * - 동기화 방식에서만 사용된다
+   *
+   * @param request {@link Request}
+   * @param retryCount 재시도 수
+   * @return {@link Response}
+   * @since 1.0
+   */
+  private Response invokeInternal(Request request, int retryCount) {
+    if (retryCount < 0) {
+      LogUtil.getLogger().error("-http request retry failed: {}", request.url().toString());
+      throw new HttpException(HttpStatus.REQUEST_FAILED_499, "Retry failed");
     }
+    Response response;
+    try {
+      response = getClient().newCall(request).execute();
+    } catch (IOException ex) {
+      LogUtil.getLogger().warn("-http exception: {}, retry: {}, exception: {}", request.url().toString(), retryCount, ex.getMessage());
+      return invokeInternal(request, --retryCount);
+    }
+    if (containsRetryStatus(HttpStatus.lookup(response.code()))) {
+      LogUtil.getLogger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
+      return invokeInternal(request, --retryCount);
+    }
+    return response;
   }
 
   @Override

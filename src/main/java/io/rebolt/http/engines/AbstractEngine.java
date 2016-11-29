@@ -27,6 +27,7 @@ import io.rebolt.http.HttpStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Random;
 import java.util.Set;
 
 import static io.rebolt.http.HttpStatus.GATEWAY_TIMEOUT_504;
@@ -106,6 +107,14 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   public void addRetryStatus(HttpStatus... statuses) {
     if (!ObjectUtil.isNull(statuses)) {
       retryStatus.addAll(Lists.newArrayList(statuses));
+    }
+  }
+
+  protected void goSleep() {
+    try {
+      Thread.sleep(new Random().nextInt(1000) + 1000); // 1~2초 사이
+    } catch (InterruptedException ignored) {
+      // ignored...
     }
   }
 
