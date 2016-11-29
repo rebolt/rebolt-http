@@ -124,6 +124,13 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     return builder.build();
   }
 
+  /**
+   * 통신엔진용 응답객체 생성
+   *
+   * @param httpRequest {@link HttpRequest}
+   * @param response {@link Response}
+   * @since 1.0
+   */
   @Override
   public HttpResponse makeResponse(HttpRequest httpRequest, Response response) {
     // step 1 : header
@@ -142,10 +149,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     return new HttpResponse(response.code(), header, responseObject);
   }
 
-  @Override
-  public Callback makeCallback(HttpCallback callback) {
-    return null;
-  }
+  // region sync-invoke
 
   @Override
   public Response invoke(Request request) {
@@ -170,7 +174,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     try {
       response = getClient().newCall(request).execute();
     } catch (IOException ex) {
-      LogUtil.getLogger().warn("-http exception: {}, retry: {}, exception: {}", request.url().toString(), retryCount, ex.getMessage());
+      LogUtil.getLogger().warn("-http exception: {}, retry: {}", request.url().toString(), retryCount);
       return invokeInternal(request, --retryCount);
     }
     if (response == null) {
@@ -179,13 +183,25 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     }
     if (containsRetryStatus(HttpStatus.lookup(response.code()))) {
       LogUtil.getLogger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
+      goSleep();
       return invokeInternal(request, --retryCount);
     }
     return response;
   }
 
+  // endregion
+
+  // region async-invoke
+
   @Override
   public void invokeAsync(Request request, Callback callback) {
     getClient();
   }
+
+  @Override
+  public Callback makeCallback(HttpCallback callback) {
+    return null;
+  }
+
+  // endregion
 }

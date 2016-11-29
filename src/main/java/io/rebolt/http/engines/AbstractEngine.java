@@ -74,7 +74,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
 
   /**
    * 커넥션 후, 데이터송신 타임아웃 설정
-   *
+   * <p>
    * 기본값 : 5,000 milliseconds
    */
   private @Getter @Setter int writeTimeout = 5000;
@@ -110,6 +110,11 @@ public abstract class AbstractEngine<RQ, RS, CB> {
     }
   }
 
+  /**
+   * 요청에 할당된 스레드를 1~2초사이의 Sleep을 진행한다
+   *
+   * @since 1.0
+   */
   protected void goSleep() {
     try {
       Thread.sleep(new Random().nextInt(1000) + 1000); // 1~2초 사이
