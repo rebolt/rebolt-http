@@ -173,6 +173,10 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
       LogUtil.getLogger().warn("-http exception: {}, retry: {}, exception: {}", request.url().toString(), retryCount, ex.getMessage());
       return invokeInternal(request, --retryCount);
     }
+    if (response == null) {
+      LogUtil.getLogger().error("-http request failed: {}, null response", request.url().toString());
+      throw new HttpException(HttpStatus.REQUEST_FAILED_499, "Null response");
+    }
     if (containsRetryStatus(HttpStatus.lookup(response.code()))) {
       LogUtil.getLogger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
       return invokeInternal(request, --retryCount);
