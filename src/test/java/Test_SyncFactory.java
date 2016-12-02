@@ -14,6 +14,7 @@
  * under the License.
  */
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
 import io.rebolt.http.HttpStatus;
@@ -28,10 +29,20 @@ public final class Test_SyncFactory {
   @Test
   public void test_get() {
     SyncFactory factory = new SyncFactory(OkHttp3Engine.class);
-    HttpRequest request = HttpRequest.create().url("https://m-api.nexon.com");
+    HttpRequest request = HttpRequest.create().url("https://stamp.mp.nexon.com/ver");
     HttpResponse<String> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));
     assertTrue(response.getBody().length() > 0);
+  }
+
+  @Test
+  public void test_get2() {
+    SyncFactory factory = new SyncFactory();
+    HttpRequest request = HttpRequest.create(JsonNode.class).url("https://m-api.nexon.com/signin.nx");
+    HttpResponse<JsonNode> response = factory.invoke(request);
+
+    assertTrue(response.getStatus().equals(HttpStatus.NOT_FOUND_404));
+    assertTrue(response.getBody().get("errorCode").asInt() == -2);
   }
 }

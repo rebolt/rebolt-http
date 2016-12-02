@@ -58,6 +58,7 @@ public final class ConverterTable {
      * {@link StringToJsonConverter}
      */
     add(String.class, JsonNode.class, StringToJsonConverter.class);
+    add(void.class, JsonNode.class, StringToJsonConverter.class);
   }
 
   /**
@@ -92,6 +93,19 @@ public final class ConverterTable {
     if (converterMap == null) {
       return null;
     }
-    return converterMap.get(responseType);
+    Converter converter = converterMap.get(responseType);
+    if (converter == null) {
+      return getDefault();
+    }
+    return converter;
+  }
+
+  /**
+   * 기본 {@link Converter} 조회
+   *
+   * @since 1.0
+   */
+  public static Converter getDefault() {
+    return get(String.class, String.class);
   }
 }
