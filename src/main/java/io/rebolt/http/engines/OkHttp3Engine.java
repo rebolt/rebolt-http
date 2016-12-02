@@ -25,9 +25,13 @@ import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
 import io.rebolt.http.HttpStatus;
 import io.rebolt.http.exceptions.HttpException;
+import io.rebolt.http.executors.LinkedBlockingThreadExecutor;
+import io.rebolt.http.executors.SimpleThreadFactory;
 import io.rebolt.http.factories.AbstractFactory;
+import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,8 +39,11 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.rebolt.http.HttpMethod.Get;
+import static io.rebolt.http.HttpStatus.REQUEST_FAILED_499;
+import static io.rebolt.http.HttpStatus.REQUEST_TIMEOUT_408;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
@@ -46,28 +53,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
   private OkHttpClient client;
+  private OkHttpClient asyncClient;
   private final Object _lock = new Object();
 
-  /**
-   * {@link AbstractFactory}의 설정값을 이용하여 {@link OkHttpClient}를 생성한다.
-   *
-   * @since 1.0
-   */
-  private OkHttpClient getClient() {
-    if (client == null) {
-      synchronized (_lock) {
-        if (client == null) {
-          client = new OkHttpClient.Builder()
-              .connectTimeout(getConnectionTimeout(), MILLISECONDS)
-              .readTimeout(getReadTimeout(), MILLISECONDS)
-              .writeTimeout(getWriteTimeout(), MILLISECONDS)
-              .connectionPool(new ConnectionPool(getConnectionPoolMaxIdleCount(), getConnectionPoolKeepAliveDuration(), MILLISECONDS))
-              .build();
-        }
-      }
-    }
-    return client;
-  }
+  // region make request & response
 
   /**
    * 통신엔진용 요청객체 생성
@@ -145,7 +134,30 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     return new HttpResponse(response.code(), header, responseObject);
   }
 
+  // endregion
+
   // region sync-invoke
+
+  /**
+   * {@link AbstractFactory}의 설정값을 이용하여 {@link OkHttpClient}를 생성한다.
+   *
+   * @since 1.0
+   */
+  private OkHttpClient getClient() {
+    if (client == null) {
+      synchronized (_lock) {
+        if (client == null) {
+          client = new OkHttpClient.Builder()
+              .connectTimeout(getConnectionTimeout(), MILLISECONDS)
+              .readTimeout(getReadTimeout(), MILLISECONDS)
+              .writeTimeout(getWriteTimeout(), MILLISECONDS)
+              .connectionPool(new ConnectionPool(getConnectionPoolMaxIdleCount(), getConnectionPoolKeepAliveDuration(), MILLISECONDS))
+              .build();
+        }
+      }
+    }
+    return client;
+  }
 
   @Override
   public Response invoke(Request request) {
@@ -164,7 +176,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
   private Response invokeInternal(Request request, int retryCount) {
     if (retryCount < 0) {
       LogUtil.getLogger().error("-http request retry failed: {}", request.url().toString());
-      throw new HttpException(HttpStatus.REQUEST_FAILED_499, "Retry failed");
+      throw new HttpException(REQUEST_FAILED_499, "Retry failed");
     }
     Response response;
     try {
@@ -175,7 +187,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     }
     if (response == null) {
       LogUtil.getLogger().error("-http request failed: {}, null response", request.url().toString());
-      throw new HttpException(HttpStatus.REQUEST_FAILED_499, "Null response");
+      throw new HttpException(REQUEST_FAILED_499, "Null response");
     }
     if (containsRetryStatus(HttpStatus.lookup(response.code()))) {
       LogUtil.getLogger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
@@ -189,14 +201,96 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
 
   // region async-invoke
 
-  @Override
-  public void invokeAsync(Request request, Callback callback) {
-    getClient();
+  private OkHttpClient getAsyncClient() {
+    if (asyncClient == null) {
+      synchronized (_lock) {
+        if (asyncClient == null) {
+          asyncClient = new OkHttpClient.Builder()
+              .connectTimeout(getConnectionTimeout(), MILLISECONDS)
+              .readTimeout(getReadTimeout(), MILLISECONDS)
+              .writeTimeout(getWriteTimeout(), MILLISECONDS)
+              .connectionPool(new ConnectionPool(getConnectionPoolMaxIdleCount(), getConnectionPoolKeepAliveDuration(), MILLISECONDS))
+              .dispatcher(new Dispatcher(new LinkedBlockingThreadExecutor.Builder()
+                  .setThreadCount(getThreadCount())
+                  .setThreadFactory(new SimpleThreadFactory())
+                  .setThreadIdleTime(getThreadIdleTime())
+                  .setLinkedBlockingQueue(getRequestQueueSize()).build()))
+              .build();
+        }
+      }
+    }
+    return asyncClient;
   }
 
   @Override
-  public Callback makeCallback(HttpCallback callback) {
-    return null;
+  public void invokeAsync(Request request, Callback callback) {
+    getAsyncClient().newCall(request).enqueue(callback);
+  }
+
+  @Override
+  public Callback makeCallback(HttpRequest request, HttpCallback callback) {
+    return new OkHttp3Callback(this, request, callback);
+  }
+
+  private static class OkHttp3Callback implements Callback {
+    private final OkHttp3Engine engine;
+    private final HttpRequest httpRequest;
+    private final HttpCallback httpCallback;
+    private final AtomicInteger retryCount;
+
+    private OkHttp3Callback(final OkHttp3Engine engine, final HttpRequest httpRequest, final HttpCallback httpCallback) {
+      this.engine = engine;
+      this.httpRequest = httpRequest;
+      this.httpCallback = httpCallback;
+      this.retryCount = new AtomicInteger(engine.getRetryCount());
+    }
+
+    @Override
+    public void onFailure(Call call, IOException ex) {
+      LogUtil.getLogger().warn("-http async exception: {}, retry: {}, exception: {}", call.request().url().toString(), retryCount, ex);
+      if (retryCount.decrementAndGet() > 0) {
+        call.enqueue(this);
+      } else {
+        error(call, REQUEST_TIMEOUT_408);
+      }
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException {
+      try {
+        if (!engine.containsRetryStatus(HttpStatus.lookup(response.code()))) {
+          success(response);
+        } else {
+          if (retryCount.decrementAndGet() < 0) {
+            LogUtil.getLogger().info("-http async exception: {}, retry: {}", call.request().url().toString(), retryCount);
+            call.enqueue(this);
+          } else {
+            error(call, HttpStatus.lookup(response.code()));
+          }
+        }
+      } catch (Exception ex) {
+        errorException(call, ex);
+      }
+    }
+
+    private void error(Call call, HttpStatus httpStatus) {
+      call.cancel();
+      LogUtil.getLogger().info("-http async request retry failed: {}", call.request().url().toString());
+      //noinspection unchecked
+      httpCallback.onReceive(new HttpResponse(new HttpException(httpStatus)));
+    }
+
+    private void errorException(Call call, Exception ex) {
+      call.cancel();
+      LogUtil.getLogger().error("-http async request error: {}, exception: {}", call.request().url().toString(), ex);
+      //noinspection unchecked
+      httpCallback.onReceive(new HttpResponse(new HttpException(REQUEST_FAILED_499, ex.getMessage())));
+    }
+
+    private void success(Response response) {
+      //noinspection unchecked
+      httpCallback.onReceive(engine.makeResponse(httpRequest, response));
+    }
   }
 
   // endregion

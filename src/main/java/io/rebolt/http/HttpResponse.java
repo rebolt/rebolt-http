@@ -51,6 +51,11 @@ public final class HttpResponse<R> implements IModel<HttpResponse> {
     this.body = body;
   }
 
+  public HttpResponse(HttpException exception) {
+    this.status = exception.getStatus();
+    this.exception = exception;
+  }
+
   public boolean hasError() {
     return !ObjectUtil.isNull(exception) && exception.hasError();
   }

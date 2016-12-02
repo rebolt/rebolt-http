@@ -19,11 +19,11 @@ public final class HttpException extends ReboltException {
     this(HttpStatus.lookup(status), STRING_EMPTY);
   }
 
-  public HttpException(int status, String message) {
+  public HttpException(int status, final String message) {
     this(HttpStatus.lookup(status), message);
   }
 
-  public HttpException(HttpStatus status) {
+  public HttpException(final HttpStatus status) {
     this(status, STRING_EMPTY);
   }
 

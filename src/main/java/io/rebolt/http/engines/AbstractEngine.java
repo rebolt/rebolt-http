@@ -19,7 +19,6 @@ package io.rebolt.http.engines;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.rebolt.core.utils.ObjectUtil;
-import io.rebolt.core.utils.ReflectionUtil;
 import io.rebolt.http.HttpCallback;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
@@ -29,6 +28,7 @@ import lombok.Setter;
 
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import static io.rebolt.http.HttpStatus.GATEWAY_TIMEOUT_504;
 import static io.rebolt.http.HttpStatus.REQUEST_TIMEOUT_408;
@@ -46,9 +46,7 @@ import static io.rebolt.http.HttpStatus.TOO_MANY_REQUESTS_429;
  */
 public abstract class AbstractEngine<RQ, RS, CB> {
 
-  private @Getter Class<RQ> request = ReflectionUtil.typeFinder(getClass(), 0);
-  private @Getter Class<RS> response = ReflectionUtil.typeFinder(getClass(), 1);
-  private @Getter Class<CB> callback = ReflectionUtil.typeFinder(getClass(), 2);
+  // region getter, setter
 
   /**
    * 요청 실패시, 재시도를 시도하는 수를 정의한다.
@@ -111,6 +109,29 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   }
 
   /**
+   * 스레드풀 수 (Async 전용)
+   * <p>
+   * 기본값 : 10개
+   */
+  private @Getter @Setter int threadCount = 10;
+
+  /**
+   * 스레드 대기 시간 (Async 전용)
+   * <p>
+   * 기본값 : 1,000 milliseconds
+   */
+  private @Getter @Setter int threadIdleTime = 1000;
+
+  /**
+   * 요청 최대 대기수 (Async 전용)
+   * <p>
+   * 기본값 : 0
+   */
+  private @Getter @Setter int requestQueueSize = 0;
+
+  // endregion
+
+  /**
    * 요청에 할당된 스레드를 1~2초사이의 Sleep을 진행한다
    *
    * @since 1.0
@@ -139,14 +160,6 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   public abstract HttpResponse makeResponse(HttpRequest request, RS response);
 
   /**
-   * 콜백 객체를 생성한다.
-   *
-   * @param callback {@link HttpCallback} rebolt-http 사용하는 콜백 객체
-   * @since 1.0
-   */
-  public abstract CB makeCallback(HttpCallback callback);
-
-  /**
    * 요청
    *
    * @param request 통신엔진에서 사용하는 Request 인스턴스
@@ -163,4 +176,14 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    * @since 1.0
    */
   public abstract void invokeAsync(RQ request, CB callback);
+
+  /**
+   * 콜백 객체를 생성한다.
+   *
+   * @param request {@link HttpRequest}
+   * @param callback {@link HttpCallback} rebolt-http 사용하는 콜백 객체
+   * @since 1.0
+   */
+  public abstract CB makeCallback(HttpRequest request, HttpCallback callback);
+
 }

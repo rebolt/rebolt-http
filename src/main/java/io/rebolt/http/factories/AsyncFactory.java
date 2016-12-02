@@ -1,16 +1,12 @@
 package io.rebolt.http.factories;
 
 import io.rebolt.core.utils.ClassUtil;
+import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpCallback;
 import io.rebolt.http.HttpRequest;
 import io.rebolt.http.HttpResponse;
-import io.rebolt.http.executors.LinkedBlockingThreadExecutor;
-import io.rebolt.http.executors.SimpleThreadFactory;
 import io.rebolt.http.engines.AbstractEngine;
-import lombok.Getter;
-
-import java.util.Objects;
-import java.util.concurrent.ExecutorService;
+import io.rebolt.http.engines.OkHttp3Engine;
 
 /**
  * 비동기패턴 클라이언트 팩토리
@@ -19,22 +15,26 @@ import java.util.concurrent.ExecutorService;
  */
 public final class AsyncFactory extends AbstractFactory {
 
-  private @Getter ExecutorService threadPool;
-
-  public AsyncFactory(Class<? extends AbstractEngine> templateClass) {
-    super.setEngine(ClassUtil.newInstance(templateClass));
+  public AsyncFactory() {
+    super.setEngine(ClassUtil.newInstance(OkHttp3Engine.class));
   }
 
-  public void setThreadPool(final ExecutorService threadPool) {
-    this.threadPool = threadPool;
+  public AsyncFactory(Class<? extends AbstractEngine> engineClass) {
+    super.setEngine(ClassUtil.newInstance(engineClass));
   }
 
-  public void setThreadPool(int maxThread, int threadIdleMillis, int maxQueue) {
-    this.threadPool = new LinkedBlockingThreadExecutor.Builder()
-        .setThreadCount(maxThread)
-        .setThreadFactory(new SimpleThreadFactory())
-        .setThreadIdleTime(threadIdleMillis)
-        .setLinkedBlockingQueue(maxQueue).build();
+  /**
+   * 스레드풀 사이즈
+   */
+  public void setThreadCount(int threadCount) {
+    engine.setThreadCount(threadCount);
+  }
+
+  /**
+   * 스레드별 유휴시간
+   */
+  public void setThreadIdleTime(int threadIdleTime) {
+    engine.setThreadIdleTime(threadIdleTime);
   }
 
   /**
@@ -47,8 +47,8 @@ public final class AsyncFactory extends AbstractFactory {
    */
   @SuppressWarnings("unchecked")
   public <R> void invoke(HttpRequest request, HttpCallback<R> callback) {
-    Objects.requireNonNull(engine);
-    engine.invokeAsync(engine.makeRequest(request), engine.makeCallback(callback));
+    ObjectUtil.requireNonNull(engine);
+    engine.invokeAsync(engine.makeRequest(request), engine.makeCallback(request, callback));
   }
 
 }
