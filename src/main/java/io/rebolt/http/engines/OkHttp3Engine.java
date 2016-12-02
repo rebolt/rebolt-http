@@ -45,10 +45,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @since 1.0
  */
 public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callback> {
-
-  /**
-   *
-   */
   private OkHttpClient client;
   private final Object _lock = new Object();
 

@@ -16,6 +16,7 @@
 
 package io.rebolt.http.converters;
 
+import com.google.common.net.MediaType;
 import io.rebolt.core.utils.ObjectUtil;
 
 import static io.rebolt.core.constants.Constants.CHARSET_UTF8;
@@ -32,5 +33,15 @@ final class StringConverter implements BytesConverter<String, String> {
   @Override
   public String convertResponse(byte[] rawResponse) {
     return ObjectUtil.isNull(rawResponse) ? null : new String(rawResponse, CHARSET_UTF8);
+  }
+
+  @Override
+  public String getContentType() {
+    return MediaType.PLAIN_TEXT_UTF_8.toString();
+  }
+
+  @Override
+  public String getAccept() {
+    return MediaType.HTML_UTF_8.toString();
   }
 }

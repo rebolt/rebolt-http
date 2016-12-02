@@ -64,9 +64,9 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   private HttpRequest(Class<?> requestType, Class<?> responseType) {
-    this.header = HttpHeader.create();
     this.method = Get;
     this.converter = ConverterTable.get(requestType, responseType);
+    this.header = HttpHeader.create(converter);
   }
 
   // region builders

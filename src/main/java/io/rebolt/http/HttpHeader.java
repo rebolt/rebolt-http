@@ -6,6 +6,7 @@ import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.core.utils.StringUtil;
+import io.rebolt.http.converters.Converter;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -18,6 +19,7 @@ import static io.rebolt.http.HttpHeader.Header.UserAgent;
 @ToString
 public final class HttpHeader implements IModel<HttpHeader> {
   private static final long serialVersionUID = 576771757645112134L;
+  private static final String userAgent = "Rebolt-Http/1.0";
   private @Getter Map<String, String> headerMap;
 
   /**
@@ -33,12 +35,25 @@ public final class HttpHeader implements IModel<HttpHeader> {
    */
   public static HttpHeader create() {
     return new HttpHeader()
-        .add(UserAgent, "Rebolt-Http/1.0")
+        .add(UserAgent, userAgent)
         .add(Accept, MediaType.PLAIN_TEXT_UTF_8);
   }
 
   /**
-   * HttpHEader 생성 (기본값 없음, 응답용)
+   * HttpHeader 생성 (with {@link Converter}
+   *
+   * @param converter {@link Converter}
+   * @since 1.0
+   */
+  public static HttpHeader create(Converter converter) {
+    return new HttpHeader()
+        .add(UserAgent, userAgent)
+        .addAccept(converter.getAccept())
+        .addContentType(converter.getContentType());
+  }
+
+  /**
+   * HttpHeader 생성 (기본값 없음, 응답용)
    *
    * @return {@link HttpHeader}
    * @since 1.0

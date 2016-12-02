@@ -18,6 +18,7 @@ package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.MediaType;
 import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
 
@@ -54,5 +55,15 @@ final class JsonConverter implements BytesConverter<JsonNode, JsonNode> {
       LogUtil.warn(e);
       return null;
     }
+  }
+
+  @Override
+  public String getContentType() {
+    return MediaType.JSON_UTF_8.toString();
+  }
+
+  @Override
+  public String getAccept() {
+    return MediaType.JSON_UTF_8.toString();
   }
 }

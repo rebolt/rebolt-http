@@ -33,4 +33,6 @@ import io.rebolt.http.HttpForm;
 public interface Converter<Request, Raw, Response> {
   Raw convertRequest(Request request);
   Response convertResponse(Raw rawResponse);
+  String getContentType();
+  String getAccept();
 }

@@ -1,5 +1,6 @@
 package io.rebolt.http.factories;
 
+import io.rebolt.core.exceptions.NotInitializedException;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpStatus;
 import io.rebolt.http.converters.Converter;
@@ -21,6 +22,7 @@ public abstract class AbstractFactory {
    * @param engine {@link AbstractEngine}
    */
   protected void setEngine(AbstractEngine engine) {
+    ObjectUtil.requireNonNull(engine);
     this.engine = engine;
   }
 
@@ -31,17 +33,51 @@ public abstract class AbstractFactory {
    */
   public void setConnectionTimeout(int connectionTimeout) {
     ObjectUtil.requireNonNull(engine);
+    if (connectionTimeout < 200) {
+      throw new NotInitializedException("connectionTimeout must be greater than 200 milliseconds");
+    }
     engine.setConnectionTimeout(connectionTimeout);
   }
 
   /**
-   * 타임아웃 설정
+   * 수신 타임아웃 설정
    *
+   * @param readTimeout milliseconds
    * @since 1.0
    */
   public void setReadTimeout(int readTimeout) {
     ObjectUtil.requireNonNull(engine);
+    if (readTimeout < 200) {
+      throw new NotInitializedException("readTimeout must be greater than 200 milliseconds");
+    }
     engine.setReadTimeout(readTimeout);
+  }
+
+  /**
+   * 송신 타임아웃 설정
+   *
+   * @param writeTimeout milliseconds
+   * @since 1.0
+   */
+  public void setWriteTimeout(int writeTimeout) {
+    ObjectUtil.requireNonNull(engine);
+    if (writeTimeout < 200) {
+      throw new NotInitializedException("writeTimeout must be greater than 200 milliseconds");
+    }
+    engine.setWriteTimeout(writeTimeout);
+  }
+
+  /**
+   * 요청당 재시도 횟수
+   *
+   * @since 1.0
+   */
+  public void setRetryCount(int retryCount) {
+    ObjectUtil.requireNonNull(engine);
+    if (retryCount < 0) {
+      retryCount = 0;
+    }
+    engine.setRetryCount(retryCount);
   }
 
   /**
