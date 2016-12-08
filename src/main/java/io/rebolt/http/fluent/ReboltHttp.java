@@ -15,7 +15,9 @@ import java.util.Map;
 
 import static io.rebolt.http.HttpMethod.Delete;
 import static io.rebolt.http.HttpMethod.Get;
+import static io.rebolt.http.HttpMethod.Head;
 import static io.rebolt.http.HttpMethod.Post;
+import static io.rebolt.http.HttpMethod.Put;
 import static io.rebolt.http.HttpRequest.create;
 import static io.rebolt.http.converters.ConverterTable.getBodyType;
 
@@ -56,26 +58,98 @@ public final class ReboltHttp<T> {
 
   // region method
 
+  /**
+   * Get 방식으로 요청을 생성한다.
+   *
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
   public static ReboltHttp<String> get() {
     return new ReboltHttp<>(Get, String.class);
   }
 
+  /**
+   * Get 방식으로 요청을 생성한다.
+   *
+   * @param responseType {@link HttpResponse}에서 사용하게될 타입 선언
+   * @param <T> {@link HttpResponse} 제네릭 타입
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
   public static <T> ReboltHttp<T> get(Class<T> responseType) {
     return new ReboltHttp<>(Get, responseType);
   }
 
+  /**
+   * Post 방식으로 요청을 생성한다.
+   *
+   * @param responseType {@link HttpResponse}에서 사용하게될 타입 선언
+   * @param <T> {@link HttpResponse} 제네릭 타입
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
   public static <T> ReboltHttp<T> post(Class<T> responseType) {
     return new ReboltHttp<>(Post, responseType);
   }
 
+  /**
+   * Head 방식으로 요청을 생성한다.
+   *
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
+  public static ReboltHttp<String> head() {
+    return new ReboltHttp<>(Head, String.class);
+  }
+
+  /**
+   * Head 방식으로 요청을 생성한다.
+   *
+   * @param responseType {@link HttpResponse}에서 사용하게될 타입 선언
+   * @param <T> {@link HttpResponse} 제네릭 타입
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
+  public static <T> ReboltHttp<T> head(Class<T> responseType) {
+    return new ReboltHttp<>(Head, responseType);
+  }
+
+  /**
+   * Delete 방식으로 요청을 생성한다.
+   *
+   * @param responseType {@link HttpResponse}에서 사용하게될 타입 선언
+   * @param <T> {@link HttpResponse} 제네릭 타입
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
   public static <T> ReboltHttp<T> delete(Class<T> responseType) {
     return new ReboltHttp<>(Delete, responseType);
+  }
+
+  /**
+   * Put 방식으로 요청을 생성한다.
+   *
+   * @param responseType {@link HttpResponse}에서 사용하게될 타입 선언
+   * @param <T> {@link HttpResponse} 제네릭 타입
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
+  public static <T> ReboltHttp<T> put(Class<T> responseType) {
+    return new ReboltHttp<>(Put, responseType);
   }
 
   // endregion
 
   // region builder
 
+  /**
+   * 웹주소를 설정한다.
+   * 잘못된 형식의 웹주소가 전달되면 {@link IllegalParameterException}이 발생한다.
+   *
+   * @param uri 스키마와 쿼리스트링을 포함한 전체 웹주소(URI)를 전달한다. 예) https://www.nexon.com?key=value
+   * @return {@link ReboltHttp}
+   * @since 1.0
+   */
   public ReboltHttp<T> uri(String uri) {
     try {
       this.uri = new URI(uri);
@@ -101,6 +175,13 @@ public final class ReboltHttp<T> {
     return this;
   }
 
+  /**
+   * Request Body를 설정한다.
+   * Body가 없다면 호출하지 않아도 된다.
+   *
+   * @param body Request Body
+   * @return {@link ReboltHttp}
+   */
   public ReboltHttp<T> body(Object body) {
     this.body = body;
     return this;
