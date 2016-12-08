@@ -38,19 +38,38 @@ public final class HttpRequest implements IModel<HttpRequest> {
   private final Converter converter;
   private @Getter HttpHeader header;
   private @Getter HttpMethod method;
-  private @Getter String url;
-  private @Getter String path;
+  private @Getter String uri;
   private @Getter HttpForm form;
   private @Getter Object body;
 
+  /**
+   * HttpRequest 생성.
+   * Request, Respone 타입은 기본값으로 설정된다.
+   *
+   * @return {@link HttpRequest}
+   */
   public static HttpRequest create() {
     return new HttpRequest();
   }
 
+  /**
+   * HttpRequest 생성.
+   * Request 타입은 기본값으로 설정된다.
+   *
+   * @param responseType Response 타입, Accept 헤더에 영향을 준다.
+   * @return {@link HttpRequest}
+   */
   public static HttpRequest create(Class<?> responseType) {
     return new HttpRequest(responseType);
   }
 
+  /**
+   * HttpRequest 생성.
+   *
+   * @param requestType Request 타입, Content-Type 헤더에 영향을 준다.
+   * @param responseType Response 타입, Accept 헤더에 영향을 준다.
+   * @return {@link HttpRequest}
+   */
   public static HttpRequest create(Class<?> requestType, Class<?> responseType) {
     return new HttpRequest(requestType, responseType);
   }
@@ -72,7 +91,9 @@ public final class HttpRequest implements IModel<HttpRequest> {
   // region builders
 
   public HttpRequest header(HttpHeader header) {
-    this.header = header;
+    if (!ObjectUtil.isNull(header)) {
+      this.header.addAll(header);
+    }
     return this;
   }
 
@@ -104,13 +125,8 @@ public final class HttpRequest implements IModel<HttpRequest> {
     return this;
   }
 
-  public HttpRequest url(String url) {
-    this.url = url;
-    return this;
-  }
-
-  public HttpRequest path(String path) {
-    this.path = path;
+  public HttpRequest uri(String uri) {
+    this.uri = uri;
     return this;
   }
 
@@ -124,7 +140,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   public HttpRequest body(Object body) {
-    if (!Get.equals(method)) {
+    if (!Get.equals(method) && !ObjectUtil.isNull(body)) {
       this.body = body;
     }
     return this;
@@ -140,8 +156,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
    */
   public String getEndpointUri() {
     StringBuilder endpoint = new StringBuilder();
-    endpoint.append(url);
-    ObjectUtil.thenNonEmpty(path, endpoint::append);
+    endpoint.append(uri);
     ObjectUtil.thenNonEmpty(form, form -> endpoint.append("?").append(form.toFormString()));
     return endpoint.toString();
   }
@@ -156,12 +171,12 @@ public final class HttpRequest implements IModel<HttpRequest> {
 
   @Override
   public boolean isEmpty() {
-    return ObjectUtil.isOrNull(method, body) || ObjectUtil.isEmpty(url);
+    return ObjectUtil.isOrNull(method, body) || ObjectUtil.isEmpty(uri);
   }
 
   @Override
   public long deepHash() {
-    return HashUtil.deepHash(header, method, url, body);
+    return HashUtil.deepHash(header, method, uri, body);
   }
 
   @Override

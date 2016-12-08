@@ -28,7 +28,7 @@ public final class Test_AsyncFactory {
   @Test
   public void test_get() {
     AsyncFactory factory = new AsyncFactory();
-    HttpRequest request = HttpRequest.create().url("https://stamp.mp.nexon.com/ver");
+    HttpRequest request = HttpRequest.create().uri("https://stamp.mp.nexon.com/ver");
 
     Thread mainThread = Thread.currentThread();
     factory.invoke(request, (HttpResponse<String> response) -> {
@@ -51,7 +51,7 @@ public final class Test_AsyncFactory {
   @Test
   public void test_get2() {
     AsyncFactory factory = new AsyncFactory();
-    HttpRequest request = HttpRequest.create(JsonNode.class).url("https://m-api.nexon.com/signin.nx");
+    HttpRequest request = HttpRequest.create(JsonNode.class).uri("https://m-api.nexon.com/signin.nx");
 
     Thread mainThread = Thread.currentThread();
     factory.invoke(request, (HttpResponse<JsonNode> response) -> {

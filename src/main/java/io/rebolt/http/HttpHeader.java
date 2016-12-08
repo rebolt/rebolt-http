@@ -88,6 +88,11 @@ public final class HttpHeader implements IModel<HttpHeader> {
     return this;
   }
 
+  public HttpHeader addAll(HttpHeader httpHeader) {
+    headerMap.putAll(httpHeader.getHeaderMap());
+    return this;
+  }
+
   public HttpHeader addAccept(String accept) {
     return add(Header.Accept, accept);
   }

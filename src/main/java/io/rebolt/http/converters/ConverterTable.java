@@ -19,6 +19,7 @@ package io.rebolt.http.converters;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import io.rebolt.core.utils.ClassUtil;
+import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpForm;
 
 import java.util.Map;
@@ -36,6 +37,11 @@ public final class ConverterTable {
    * Guava에서 제공하는 Table보다는 이중 Map으로 구성하는 것이 속도면에서 유리하다.
    */
   private static final Map<Class, Map<Class, Converter>> converterTable = Maps.newHashMap();
+
+  /**
+   * Object 타입에 따른 클래스 맵
+   */
+  private static final Map<String, Class> typeMap = Maps.newHashMap();
 
   static {
     /**
@@ -75,6 +81,7 @@ public final class ConverterTable {
       converterMap = Maps.newHashMap();
       converterMap.put(responseType, ClassUtil.newInstance(converterType));
       converterTable.put(requestType, converterMap);
+      typeMap.put(requestType.getSimpleName(), requestType);
     } else {
       // 존재한다면 덮어쓴다.
       converterMap.put(responseType, ClassUtil.newInstance(converterType));
@@ -98,6 +105,21 @@ public final class ConverterTable {
       return getDefault();
     }
     return converter;
+  }
+
+  /**
+   * 매핑 타입 조회.
+   * body에 들어온 Object 객체명을 통해 Converter Type을 조회한다.
+   *
+   * @param body Request Body
+   * @return {@link Class}
+   * @since 1.0
+   */
+  public static Class getBodyType(Object body) {
+    if (ObjectUtil.isNull(body)) {
+      return void.class;
+    }
+    return typeMap.get(body.getClass().getName());
   }
 
   /**
