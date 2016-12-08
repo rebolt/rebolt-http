@@ -70,7 +70,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     Request.Builder builder = new Request.Builder();
     // step 1 : header
     ObjectUtil.nullGuard(httpRequest.getHeader().getHeaderMap()).forEach(builder::addHeader);
-    // step 2 : url and path and query
+    // step 2 : uri and path and query
     builder.url(httpRequest.getEndpointUri());
     // step 3 : body - 별도의 Null 체크를 하지 않는 이유는 Null Body도 허용하기 위함
     HttpMethod method = httpRequest.getMethod();
