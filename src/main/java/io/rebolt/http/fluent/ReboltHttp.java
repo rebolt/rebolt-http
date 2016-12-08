@@ -24,16 +24,11 @@ import static io.rebolt.http.converters.ConverterTable.getBodyType;
 /**
  * 복잡한 초기 설정 없이 곧바로 Http 요청을 할 수 있는 인터페이스를 제공한다.
  * <p>
- * <code>
- * 예) HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();
- * <p>
+ * {@code 예) HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();
  * 예) HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();
- * <p>
  * 예) HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
  * "...").body(formString).call();
- * <p>
- * 예) ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });
- * </code>
+ * 예) ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... }); }
  *
  * @since 1.0
  */

@@ -152,6 +152,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
    * 목적지의 Endpoint를 가져온다.
    * 만약 {@link HttpMethod}가 Get방식이고, {@link HttpForm}이 추가되었다면 QueryString으로 사용한다.
    *
+   * @return Endpoint URI 문자열
    * @since 1.0
    */
   public String getEndpointUri() {

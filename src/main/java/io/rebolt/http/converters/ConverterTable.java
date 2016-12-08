@@ -93,6 +93,7 @@ public final class ConverterTable {
    *
    * @param requestType 요청 페이로드
    * @param responseType 응답 페이로드
+   * @return {@link Converter}
    * @since 1.0
    */
   public static Converter get(Class<?> requestType, Class<?> responseType) {
@@ -125,6 +126,7 @@ public final class ConverterTable {
   /**
    * 기본 {@link Converter} 조회
    *
+   * @return {@link Converter}
    * @since 1.0
    */
   public static Converter getDefault() {

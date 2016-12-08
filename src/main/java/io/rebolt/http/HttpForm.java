@@ -36,6 +36,7 @@ public final class HttpForm implements IModel<HttpForm> {
    *
    * @param key 키
    * @param value 값
+   * @return {@link HttpForm}
    */
   public HttpForm add(String key, String value) {
     queryMap.put(key, value);
@@ -48,6 +49,7 @@ public final class HttpForm implements IModel<HttpForm> {
    *
    * @param key 키
    * @param value 값
+   * @return {@link HttpForm}
    */
   public HttpForm addIfAbsent(String key, String value) {
     queryMap.putIfAbsent(key, value);
@@ -58,6 +60,7 @@ public final class HttpForm implements IModel<HttpForm> {
    * 대량 쿼리 추가
    *
    * @param queryMap {@link Map}
+   * @return {@link HttpForm}
    */
   public HttpForm addAll(Map<String, String> queryMap) {
     this.queryMap.putAll(queryMap);
@@ -66,6 +69,8 @@ public final class HttpForm implements IModel<HttpForm> {
 
   /**
    * Form 문자열로 변환
+   *
+   * @return Form 문자열
    */
   public final String toFormString() {
     if (ObjectUtil.isEmpty(queryMap)) {

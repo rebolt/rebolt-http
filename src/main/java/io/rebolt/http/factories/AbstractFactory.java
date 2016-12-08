@@ -29,6 +29,7 @@ public abstract class AbstractFactory {
   /**
    * 커넥션 타임아웃 설정
    *
+   * @param connectionTimeout 커넥션 타임아웃 (단위: millisecond)
    * @since 1.0
    */
   public void setConnectionTimeout(int connectionTimeout) {
@@ -42,7 +43,7 @@ public abstract class AbstractFactory {
   /**
    * 수신 타임아웃 설정
    *
-   * @param readTimeout milliseconds
+   * @param readTimeout 수신 타임아웃 설정 (단위: millisecond)
    * @since 1.0
    */
   public void setReadTimeout(int readTimeout) {
@@ -56,7 +57,7 @@ public abstract class AbstractFactory {
   /**
    * 송신 타임아웃 설정
    *
-   * @param writeTimeout milliseconds
+   * @param writeTimeout 송신 타임아웃 (단위: millisecond_
    * @since 1.0
    */
   public void setWriteTimeout(int writeTimeout) {
@@ -70,6 +71,7 @@ public abstract class AbstractFactory {
   /**
    * 요청당 재시도 횟수
    *
+   * @param retryCount 재시도 횟수
    * @since 1.0
    */
   public void setRetryCount(int retryCount) {

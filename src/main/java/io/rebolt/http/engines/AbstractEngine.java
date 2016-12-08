@@ -28,7 +28,6 @@ import lombok.Setter;
 
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import static io.rebolt.http.HttpStatus.GATEWAY_TIMEOUT_504;
 import static io.rebolt.http.HttpStatus.REQUEST_TIMEOUT_408;
@@ -147,6 +146,8 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   /**
    * 요청 객체를 생성한다.
    *
+   * @param request {@link HttpRequest}
+   * @return 통신엔진에서 사용하는 Request 인스턴스
    * @since 1.0
    */
   public abstract RQ makeRequest(HttpRequest request);
@@ -154,6 +155,8 @@ public abstract class AbstractEngine<RQ, RS, CB> {
   /**
    * 반환 객체를 생성한다.
    *
+   * @param request {@link HttpRequest}
+   * @param response 통신엔진에서 사용하는 Response 인스턴스
    * @return {@link HttpResponse} rebolt-http에서 사용하는 반환 객체
    * @since 1.0
    */
@@ -182,6 +185,7 @@ public abstract class AbstractEngine<RQ, RS, CB> {
    *
    * @param request {@link HttpRequest}
    * @param callback {@link HttpCallback} rebolt-http 사용하는 콜백 객체
+   * @return 통신엔진에서 사용하는 Callback 인스턴스
    * @since 1.0
    */
   public abstract CB makeCallback(HttpRequest request, HttpCallback callback);

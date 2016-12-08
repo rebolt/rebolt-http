@@ -43,6 +43,7 @@ public final class HttpHeader implements IModel<HttpHeader> {
    * HttpHeader 생성 (with {@link Converter}
    *
    * @param converter {@link Converter}
+   * @return {@link HttpHeader}
    * @since 1.0
    */
   public static HttpHeader create(Converter converter) {

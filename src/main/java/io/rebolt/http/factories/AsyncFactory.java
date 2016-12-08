@@ -25,6 +25,8 @@ public final class AsyncFactory extends AbstractFactory {
 
   /**
    * 스레드풀 사이즈
+   *
+   * @param threadCount 스레드풀 최대 사이즈
    */
   public void setThreadCount(int threadCount) {
     engine.setThreadCount(threadCount);
@@ -32,6 +34,8 @@ public final class AsyncFactory extends AbstractFactory {
 
   /**
    * 스레드별 유휴시간
+   *
+   * @param threadIdleTime 스레드 유휴시간 (단위: millisecond)
    */
   public void setThreadIdleTime(int threadIdleTime) {
     engine.setThreadIdleTime(threadIdleTime);
