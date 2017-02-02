@@ -57,7 +57,7 @@ public final class HttpResponse<R> implements IModel<HttpResponse> {
   }
 
   public boolean hasError() {
-    return !ObjectUtil.isNull(exception) && exception.hasError();
+    return status.hasError() || !ObjectUtil.isNull(exception) && exception.hasError();
   }
 
   @Override
