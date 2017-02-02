@@ -31,6 +31,16 @@ import static io.rebolt.http.converters.ConverterTable.getBodyType;
  * {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
  * "...").body(formString).call();}
  * {@code ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });}
+ * <code>
+ * 예) HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();
+ * <p>
+ * 예) HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();
+ * <p>
+ * 예) HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
+ * "...").body(formString).call();
+ * <p>
+ * 예) ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });
+ * </code>
  *
  * @since 1.0
  */
