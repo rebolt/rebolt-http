@@ -81,7 +81,7 @@ public final class ConverterTable {
       converterMap = Maps.newHashMap();
       converterMap.put(responseType, ClassUtil.newInstance(converterType));
       converterTable.put(requestType, converterMap);
-      typeMap.put(requestType.getSimpleName(), requestType);
+      typeMap.put(requestType.getName(), requestType);
     } else {
       // 존재한다면 덮어쓴다.
       converterMap.put(responseType, ClassUtil.newInstance(converterType));
