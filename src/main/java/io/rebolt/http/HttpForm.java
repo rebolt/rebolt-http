@@ -33,13 +33,16 @@ public final class HttpForm implements IModel<HttpForm> {
   /**
    * 쿼리 추가
    * 만약 key가 존재하다면 교체된다.
+   * 만약 value가 null이면 key가 저장되지 않는다.
    *
    * @param key 키
    * @param value 값
    * @return {@link HttpForm}
    */
   public HttpForm add(String key, String value) {
-    queryMap.put(key, value);
+    if (value != null) {
+      queryMap.put(key, value);
+    }
     return this;
   }
 
