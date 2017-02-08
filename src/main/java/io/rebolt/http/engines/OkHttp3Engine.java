@@ -175,22 +175,22 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
    */
   private Response invokeInternal(Request request, int retryCount) {
     if (retryCount < 0) {
-      LogUtil.getLogger().error("-http request retry failed: {}", request.url().toString());
+      LogUtil.logger().error("-http request retry failed: {}", request.url().toString());
       throw new HttpException(REQUEST_FAILED_499, "Retry failed");
     }
     Response response;
     try {
       response = getClient().newCall(request).execute();
     } catch (IOException ex) {
-      LogUtil.getLogger().warn("-http exception: {}, retry: {}", request.url().toString(), retryCount);
+      LogUtil.logger().warn("-http exception: {}, retry: {}", request.url().toString(), retryCount);
       return invokeInternal(request, --retryCount);
     }
     if (response == null) {
-      LogUtil.getLogger().error("-http request failed: {}, null response", request.url().toString());
+      LogUtil.logger().error("-http request failed: {}, null response", request.url().toString());
       throw new HttpException(REQUEST_FAILED_499, "Null response");
     }
     if (containsRetryStatus(HttpStatus.lookup(response.code()))) {
-      LogUtil.getLogger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
+      LogUtil.logger().warn("-http request failed: {}, retry: {}, status: {}", request.url().toString(), retryCount, response.code());
       goSleep();
       return invokeInternal(request, --retryCount);
     }
@@ -247,7 +247,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
 
     @Override
     public void onFailure(Call call, IOException ex) {
-      LogUtil.getLogger().warn("-http async exception: {}, retry: {}, exception: {}", call.request().url().toString(), retryCount, ex);
+      LogUtil.logger().warn("-http async exception: {}, retry: {}, exception: {}", call.request().url().toString(), retryCount, ex);
       if (retryCount.decrementAndGet() > 0) {
         call.enqueue(this);
       } else {
@@ -262,7 +262,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
           success(response);
         } else {
           if (retryCount.decrementAndGet() < 0) {
-            LogUtil.getLogger().info("-http async exception: {}, retry: {}", call.request().url().toString(), retryCount);
+            LogUtil.logger().info("-http async exception: {}, retry: {}", call.request().url().toString(), retryCount);
             call.enqueue(this);
           } else {
             error(call, HttpStatus.lookup(response.code()));
@@ -275,14 +275,14 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
 
     private void error(Call call, HttpStatus httpStatus) {
       call.cancel();
-      LogUtil.getLogger().info("-http async request retry failed: {}", call.request().url().toString());
+      LogUtil.logger().info("-http async request retry failed: {}", call.request().url().toString());
       //noinspection unchecked
       httpCallback.onReceive(new HttpResponse(new HttpException(httpStatus)));
     }
 
     private void errorException(Call call, Exception ex) {
       call.cancel();
-      LogUtil.getLogger().error("-http async request error: {}, exception: {}", call.request().url().toString(), ex);
+      LogUtil.logger().error("-http async request error: {}, exception: {}", call.request().url().toString(), ex);
       //noinspection unchecked
       httpCallback.onReceive(new HttpResponse(new HttpException(REQUEST_FAILED_499, ex.getMessage())));
     }
