@@ -46,7 +46,19 @@ public final class HeaderParser {
     });
   }
 
+  public boolean isEmpty() {
+    return mediaTypes == null || mediaTypes.isEmpty();
+  }
+
   public MediaType getFirst() {
-    return mediaTypes.get(0);
+    return isEmpty() ? MediaType.ANY_TYPE : mediaTypes.get(0);
+  }
+
+  public boolean isFirst(MediaType mediaType) {
+    return isEmpty() || mediaTypes.get(0).is(mediaType.withoutParameters());
+  }
+
+  public boolean contains(MediaType mediaType) {
+    return isEmpty() || mediaTypes.stream().anyMatch(entry -> entry.is(mediaType.withoutParameters()));
   }
 }
