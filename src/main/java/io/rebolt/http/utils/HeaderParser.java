@@ -16,26 +16,34 @@
 
 package io.rebolt.http.utils;
 
+import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static io.rebolt.core.utils.ObjectUtil.requireNonNull;
 
 /**
- * HttpHeader Accept 분석기
+ * HttpHeader 해석기
+ *
+ * @since 1.0.6
  */
-public final class HttpHeaderAccept {
+public final class HeaderParser {
   private final @Getter String origin;
   private final @Getter List<MediaType> mediaTypes;
 
-  public HttpHeaderAccept(final String headerString) {
+  public HeaderParser(final String headerString) {
     requireNonNull(headerString);
     this.origin = headerString;
-    this.mediaTypes = StringUtil.split(',', headerString).stream().map(MediaType::parse).collect(Collectors.toList());
+    this.mediaTypes = Lists.newLinkedList();
+    StringUtil.split(',', headerString).forEach(entry -> {
+      try {
+        mediaTypes.add(MediaType.parse(entry));
+      } catch (Exception ignored) {
+      }
+    });
   }
 
   public MediaType getFirst() {
