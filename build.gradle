@@ -3,7 +3,7 @@ apply plugin: "java"
 [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
 
 group = "rebolt"
-version = "1.0.6"
+version = "1.0.7"
 
 project.ext {
   name = "rebolt-http"
@@ -18,8 +18,8 @@ allprojects {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
   repositories {
-    jcenter()
     mavenCentral()
+    jcenter()
     maven { url "https://jitpack.io" }
   }
 }
