@@ -16,6 +16,8 @@ import static io.rebolt.core.constants.Constants.STRING_EQUAL;
 
 /**
  * Http 통신시 사용하는 Form 데이터를 관리할 수 있다
+ *
+ * @since 1.0.0
  */
 @ToString
 public final class HttpForm implements IModel<HttpForm> {
@@ -42,6 +44,22 @@ public final class HttpForm implements IModel<HttpForm> {
   public HttpForm add(String key, String value) {
     if (value != null) {
       queryMap.put(key, value);
+    }
+    return this;
+  }
+
+  /**
+   * 쿼리 추가
+   * 만약 key가 존재한다면 교체된다.
+   * 만약 value가 null이면 Key가 저장되지 않는다.
+   *
+   * @param key 키
+   * @param value 값
+   * @return {@link HttpForm}
+   */
+  public HttpForm add(String key, Object value) {
+    if (value != null) {
+      queryMap.put(key, value.toString());
     }
     return this;
   }
