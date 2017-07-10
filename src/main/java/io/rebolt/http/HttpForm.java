@@ -8,6 +8,7 @@ import io.rebolt.core.utils.StringUtil;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.rebolt.core.constants.Constants.STRING_AND;
@@ -26,6 +27,20 @@ public final class HttpForm implements IModel<HttpForm> {
 
   public static HttpForm create() {
     return new HttpForm();
+  }
+
+  public static HttpForm parse(String queryString) {
+    if (StringUtil.isNullOrEmpty(queryString)) {
+      return create();
+    }
+    String decodedString = StringUtil.decodeUrl(queryString);
+    List<String> queryList = StringUtil.split('&', decodedString);
+    Map<String, String> queryMap = Maps.newHashMapWithExpectedSize(queryList.size());
+    queryList.forEach(entry -> {
+      List<String> items = StringUtil.split('=', entry);
+      queryMap.put(items.get(0), items.get(1));
+    });
+    return create().addAll(queryMap);
   }
 
   private HttpForm() {
