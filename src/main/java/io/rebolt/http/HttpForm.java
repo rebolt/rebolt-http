@@ -14,6 +14,8 @@ import java.util.Map;
 import static io.rebolt.core.constants.Constants.STRING_AND;
 import static io.rebolt.core.constants.Constants.STRING_EMPTY;
 import static io.rebolt.core.constants.Constants.STRING_EQUAL;
+import static io.rebolt.core.utils.StringUtil.decodeUrl;
+import static io.rebolt.core.utils.StringUtil.split;
 
 /**
  * Http 통신시 사용하는 Form 데이터를 관리할 수 있다
@@ -33,12 +35,11 @@ public final class HttpForm implements IModel<HttpForm> {
     if (StringUtil.isNullOrEmpty(queryString)) {
       return create();
     }
-    String decodedString = StringUtil.decodeUrl(queryString);
-    List<String> queryList = StringUtil.split('&', decodedString);
+    List<String> queryList = split('&', queryString);
     Map<String, String> queryMap = Maps.newHashMapWithExpectedSize(queryList.size());
     queryList.forEach(entry -> {
-      List<String> items = StringUtil.split('=', entry);
-      queryMap.put(items.get(0), items.get(1));
+      List<String> items = split('=', entry);
+      queryMap.put(decodeUrl(items.get(0)), decodeUrl(items.get(1)));
     });
     return create().addAll(queryMap);
   }
@@ -48,9 +49,7 @@ public final class HttpForm implements IModel<HttpForm> {
   }
 
   /**
-   * 쿼리 추가
-   * 만약 key가 존재하다면 교체된다.
-   * 만약 value가 null이면 key가 저장되지 않는다.
+   * 쿼리 추가 만약 key가 존재하다면 교체된다. 만약 value가 null이면 key가 저장되지 않는다.
    *
    * @param key 키
    * @param value 값
@@ -64,9 +63,7 @@ public final class HttpForm implements IModel<HttpForm> {
   }
 
   /**
-   * 쿼리 추가
-   * 만약 key가 존재한다면 교체된다.
-   * 만약 value가 null이면 Key가 저장되지 않는다.
+   * 쿼리 추가 만약 key가 존재한다면 교체된다. 만약 value가 null이면 Key가 저장되지 않는다.
    *
    * @param key 키
    * @param value 값
@@ -80,8 +77,7 @@ public final class HttpForm implements IModel<HttpForm> {
   }
 
   /**
-   * 쿼리 추가
-   * 만약 key가 존재한다면 추가되지 않는다.
+   * 쿼리 추가 만약 key가 존재한다면 추가되지 않는다.
    *
    * @param key 키
    * @param value 값

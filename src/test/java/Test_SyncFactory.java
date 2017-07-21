@@ -31,7 +31,7 @@ public final class Test_SyncFactory {
   @Test
   public void test_get() {
     SyncFactory factory = new SyncFactory(OkHttp3Engine.class);
-    HttpRequest request = HttpRequest.create().uri("https://stamp.mp.nexon.com/ver");
+    HttpRequest request = HttpRequest.create().uri("https://m-api.nexon.com");
     HttpResponse<String> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));

@@ -28,7 +28,7 @@ public final class Test_AsyncFactory {
   @Test
   public void test_get() {
     AsyncFactory factory = new AsyncFactory();
-    HttpRequest request = HttpRequest.create().uri("https://stamp.mp.nexon.com/ver");
+    HttpRequest request = HttpRequest.create().uri("https://m-api.nexon.com");
 
     Thread mainThread = Thread.currentThread();
     factory.invoke(request, (HttpResponse<String> response) -> {
