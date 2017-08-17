@@ -3,7 +3,7 @@ apply plugin: "java"
 [compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
 
 group = "rebolt"
-version = "1.0.9"
+version = "1.1.0"
 
 project.ext {
   name = "rebolt-http"
@@ -40,15 +40,3 @@ dependencies {
   testCompile "junit:junit:$ver_junit"
 }
 
-//noinspection GroovyAssignabilityCheck
-configurations.all {
-  //noinspection GroovyAssignabilityCheck
-  resolutionStrategy {
-    // cache dynamic versions for realtime
-    cacheDynamicVersionsFor 0, 'seconds'
-    // don't cache changing modules at all
-    cacheChangingModulesFor 0, 'seconds'
-  }
-}
-
-//compileJava.dependsOn clean

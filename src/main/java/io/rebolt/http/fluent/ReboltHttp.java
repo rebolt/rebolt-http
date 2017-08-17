@@ -221,7 +221,7 @@ public final class ReboltHttp<T> {
       syncMap.put(host, new SyncFactory());
     }
 
-    // step 4 : HttpRequest 생성 및 호출
+    // step 3 : HttpRequest 생성 및 호출
     return syncMap.get(host)
         .invoke(create(requestType, responseType)
             .method(httpMethod)
