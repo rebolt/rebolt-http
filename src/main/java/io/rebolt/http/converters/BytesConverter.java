@@ -25,7 +25,7 @@ import io.rebolt.http.HttpForm;
  *
  * @param <Request> 페이로드된 요청 프로토콜 ({@link HttpForm}, {@link JsonNode}, {@link String}, ...)
  * @param <Response> 페이로드된 응답 프로토콜 (html, {@link JsonNode}, {@link String}, ...)
- * @since 1.0
+ * @since 1.0.0
  */
 public interface BytesConverter<Request, Response> extends Converter<Request, byte[], Response> {
 }

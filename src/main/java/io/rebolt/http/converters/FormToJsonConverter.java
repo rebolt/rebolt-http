@@ -22,6 +22,7 @@ import com.google.common.net.MediaType;
 import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpForm;
+import lombok.Getter;
 
 import java.io.IOException;
 

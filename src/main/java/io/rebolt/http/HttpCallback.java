@@ -8,6 +8,6 @@ import io.rebolt.http.factories.AsyncFactory;
  * 비동기로 호출된 요청에 대한 결과객체가 HttpCallback에 담긴다.
  */
 @FunctionalInterface
-public interface HttpCallback<R> {
-  void onReceive(HttpResponse<R> response);
+public interface HttpCallback<R, E> {
+  void onReceive(HttpResponse<R, E> response);
 }

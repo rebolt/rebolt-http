@@ -31,8 +31,8 @@ public final class Test_SyncFactory {
   @Test
   public void test_get() {
     SyncFactory factory = new SyncFactory(OkHttp3Engine.class);
-    HttpRequest request = HttpRequest.create().uri("https://m-api.nexon.com");
-    HttpResponse<String> response = factory.invoke(request);
+    HttpRequest request = HttpRequest.create(String.class).uri("https://m-api.nexon.com");
+    HttpResponse<String, String> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));
     assertTrue(response.getBody().length() > 0);
@@ -42,7 +42,7 @@ public final class Test_SyncFactory {
   public void test_get2() {
     SyncFactory factory = new SyncFactory();
     HttpRequest request = HttpRequest.create(JsonNode.class).uri("https://m-api.nexon.com/signin.nx");
-    HttpResponse<JsonNode> response = factory.invoke(request);
+    HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.NOT_FOUND_404));
     assertTrue(response.getBody().get("errorCode").asInt() == -2);
@@ -57,9 +57,9 @@ public final class Test_SyncFactory {
         .contentType(MediaType.JSON_UTF_8)
         .accept(MediaType.JSON_UTF_8)
         .body("{\"svcID\":1003,\"npSN\":\"10030000000001132\",\"npToken\":\"TOTmgZqnjLwSBD0kFeEUpRsvb008o76O7W5SEh9Ud651UPa73lFN\"}");
-    HttpResponse<JsonNode> response = factory.invoke(request);
+    HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));
-    assertTrue(response.getBody().get("errorCode").asInt() == -13);
+    assertTrue(response.getBody().get("errorCode").asInt() == 5002);
   }
 }

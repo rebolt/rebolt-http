@@ -50,7 +50,7 @@ public final class AsyncFactory extends AbstractFactory {
    * @since 1.0
    */
   @SuppressWarnings("unchecked")
-  public <R> void invoke(HttpRequest request, HttpCallback<R> callback) {
+  public <R, E> void invoke(HttpRequest request, HttpCallback<R, E> callback) {
     ObjectUtil.requireNonNull(engine);
     engine.invokeAsync(engine.makeRequest(request), engine.makeCallback(request, callback));
   }

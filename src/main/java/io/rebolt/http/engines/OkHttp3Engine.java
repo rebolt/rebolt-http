@@ -16,6 +16,8 @@
 
 package io.rebolt.http.engines;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import io.rebolt.core.utils.JsonUtil;
 import io.rebolt.core.utils.LogUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpCallback;
@@ -37,6 +39,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -116,22 +119,30 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
    * @param response {@link Response}
    * @since 1.0
    */
+  @SuppressWarnings("unchecked")
   @Override
   public HttpResponse makeResponse(HttpRequest httpRequest, Response response) {
-    // step 1 : header
+    // get response header
     HttpHeader header = HttpHeader.createForResponse();
     ObjectUtil.nullGuard(response.headers().toMultimap()).forEach(header::add);
-    // step 2 : response
+    // get response body
     byte[] responseBytes = null;
-    try {
-      responseBytes = response.body().bytes();
-    } catch (IOException ex) {
-      LogUtil.warn(ex);
+    ResponseBody responseBody = response.body();
+    if (responseBody != null) {
+      try {
+        responseBytes = responseBody.bytes();
+      } catch (IOException e) {
+        LogUtil.warn(e);
+      }
     }
-    //noinspection unchecked
+    // parse response
     Object responseObject = httpRequest.getConverter().convertResponse(responseBytes);
-    //noinspection unchecked
-    return new HttpResponse(response.code(), header, responseObject);
+    if (responseObject instanceof JsonNode && httpRequest.getResponseType() != JsonNode.class && response.isSuccessful()) {
+      Object parsedResponseObject = JsonUtil.read((JsonNode) responseObject, httpRequest.getResponseType());
+      return new HttpResponse(response.code(), header, parsedResponseObject, null);
+    } else {
+      return new HttpResponse(response.code(), header, responseObject);
+    }
   }
 
   // endregion
@@ -165,13 +176,12 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
   }
 
   /**
-   * 재시도횟수(Retry count)가 포함된 요청
-   * - 동기화 방식에서만 사용된다
+   * 재시도횟수(Retry count)가 포함된 요청 - 동기화 방식에서만 사용된다
    *
    * @param request {@link Request}
    * @param retryCount 재시도 수
    * @return {@link Response}
-   * @since 1.0
+   * @since 1.0.0
    */
   private Response invokeInternal(Request request, int retryCount) {
     if (retryCount < 0) {

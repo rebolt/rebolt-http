@@ -8,9 +8,9 @@ import io.rebolt.http.engines.AbstractEngine;
 import io.rebolt.http.engines.OkHttp3Engine;
 
 /**
- * 동기패턴 클라이언트 팩토리
+ * 클라이언트 팩토리 (Sync)
  *
- * @since 1.0
+ * @since 1.0.0
  */
 public final class SyncFactory extends AbstractFactory {
 
@@ -22,17 +22,9 @@ public final class SyncFactory extends AbstractFactory {
     super.setEngine(ClassUtil.newInstance(engineClass));
   }
 
-  /**
-   * 요청
-   *
-   * @param httpRequest 요청객체
-   * @param <R> 페이로드 응답클래스
-   * @return {@link HttpResponse}
-   * @since 1.0
-   */
-  public <R> HttpResponse<R> invoke(HttpRequest httpRequest) {
+  @SuppressWarnings("unchecked")
+  public <R, E> HttpResponse<R, E> invoke(HttpRequest httpRequest) {
     ObjectUtil.requireNonNull(engine);
-    //noinspection unchecked
-    return (HttpResponse<R>) engine.makeResponse(httpRequest, engine.invoke(engine.makeRequest(httpRequest)));
+    return (HttpResponse<R, E>) engine.makeResponse(httpRequest, engine.invoke(engine.makeRequest(httpRequest)));
   }
 }

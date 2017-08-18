@@ -28,27 +28,35 @@ import lombok.ToString;
  * HttpResponse
  *
  * @param <R> 응답 클래스
- * @since 1.0
+ * @since 1.0.0
  */
+@SuppressWarnings("unchecked")
 @ToString
-public final class HttpResponse<R> implements IModel<HttpResponse> {
+@Getter
+@Setter
+public class HttpResponse<R, E> implements IModel<HttpResponse> {
   private static final long serialVersionUID = 7879572529075814407L;
-  private @Getter @Setter HttpStatus status;
-  private @Getter @Setter HttpHeader header;
-  private @Getter @Setter R body;
-  /**
-   * 요청에 대한 예상되지 않은 에러가 발생했을 때 {@link HttpException} 객체가 생성된다.
-   * 정상적으로 데이터를 주고 받았을 때에는 null로 정의된다.
-   * 예상되지 않은 에러는 주로 네트워크 타임아웃등이 포함된다.
-   */
-  private @Getter @Setter HttpException exception;
+  private HttpStatus status;
+  private HttpHeader header;
+  private R body;
+  private E error; // handled error message
+  private HttpException exception; // unhandled exception
 
   public HttpResponse() {}
 
   public HttpResponse(int status, HttpHeader header, R body) {
     this.status = HttpStatus.lookup(status);
     this.header = header;
-    this.body = body;
+    if (this.status.hasError()) {
+      this.error = (E) body;
+    } else {
+      this.body = body;
+    }
+    this.exception = null;
+  }
+
+  public HttpResponse(int status, HttpHeader header, R body, E error) {
+    this(HttpStatus.lookup(status), header, body, error, null);
   }
 
   public HttpResponse(HttpException exception) {
@@ -56,8 +64,20 @@ public final class HttpResponse<R> implements IModel<HttpResponse> {
     this.exception = exception;
   }
 
+  public HttpResponse(HttpStatus status, HttpHeader header, R body, E error, HttpException exception) {
+    this.status = status;
+    this.header = header;
+    this.body = body;
+    this.error = error;
+    this.exception = exception;
+  }
+
   public boolean hasError() {
-    return status.hasError() || !ObjectUtil.isNull(exception) && exception.hasError();
+    return status.hasError() || !ObjectUtil.isNull(error) || hasException();
+  }
+
+  public boolean hasException() {
+    return !ObjectUtil.isNull(exception) && exception.hasError();
   }
 
   @Override

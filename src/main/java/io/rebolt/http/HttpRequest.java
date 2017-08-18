@@ -16,6 +16,7 @@
 
 package io.rebolt.http;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.net.MediaType;
 import io.rebolt.core.models.IModel;
 import io.rebolt.core.utils.HashUtil;
@@ -30,21 +31,23 @@ import static io.rebolt.http.HttpMethod.Get;
 /**
  * HttpRequest
  *
- * @since 1.0
+ * @since 1.0.0
  */
 @ToString
-public final class HttpRequest implements IModel<HttpRequest> {
+@Getter
+public class HttpRequest implements IModel<HttpRequest> {
   private static final long serialVersionUID = -8573892752367366044L;
   private final Converter converter;
-  private @Getter HttpHeader header;
-  private @Getter HttpMethod method;
-  private @Getter String uri;
-  private @Getter HttpForm form;
-  private @Getter Object body;
+  private final Class<?> requestType;
+  private final Class<?> responseType;
+  private HttpHeader header;
+  private HttpMethod method;
+  private String uri;
+  private HttpForm form;
+  private Object body;
 
   /**
-   * HttpRequest 생성.
-   * Request, Respone 타입은 기본값으로 설정된다.
+   * HttpRequest 생성. Request, Respone 타입은 기본값으로 설정된다.
    *
    * @return {@link HttpRequest}
    */
@@ -53,8 +56,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   /**
-   * HttpRequest 생성.
-   * Request 타입은 기본값으로 설정된다.
+   * HttpRequest 생성. Request 타입은 기본값으로 설정된다.
    *
    * @param responseType Response 타입, Accept 헤더에 영향을 준다.
    * @return {@link HttpRequest}
@@ -75,7 +77,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   private HttpRequest() {
-    this(void.class, String.class);
+    this(void.class, JsonNode.class);
   }
 
   private HttpRequest(Class<?> responseType) {
@@ -84,6 +86,8 @@ public final class HttpRequest implements IModel<HttpRequest> {
 
   private HttpRequest(Class<?> requestType, Class<?> responseType) {
     this.method = Get;
+    this.requestType = requestType;
+    this.responseType = responseType;
     this.converter = ConverterTable.get(requestType, responseType);
     this.header = HttpHeader.create(converter);
   }
@@ -91,7 +95,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   // region builders
 
   public HttpRequest header(HttpHeader header) {
-    if (!ObjectUtil.isNull(header)) {
+    if (!ObjectUtil.isEmpty(header)) {
       this.header.addAll(header);
     }
     return this;
@@ -99,7 +103,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
 
   public HttpRequest method(HttpMethod method) {
     this.method = method;
-    if (!method.equals(Get) && ObjectUtil.isEmpty(header.getContentType())) {
+    if (Get != method && ObjectUtil.isEmpty(header.getContentType())) {
       header.addContentType(MediaType.FORM_DATA);
     }
     return this;
@@ -131,7 +135,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   public HttpRequest form(HttpForm form) {
-    if (!Get.equals(method)) {
+    if (Get != method) {
       this.body = form;
     } else {
       this.form = form;
@@ -140,7 +144,7 @@ public final class HttpRequest implements IModel<HttpRequest> {
   }
 
   public HttpRequest body(Object body) {
-    if (!Get.equals(method) && !ObjectUtil.isNull(body)) {
+    if (Get != method && body != null) {
       this.body = body;
     }
     return this;
@@ -149,21 +153,16 @@ public final class HttpRequest implements IModel<HttpRequest> {
   // endregion
 
   /**
-   * 목적지의 Endpoint를 가져온다.
-   * 만약 {@link HttpMethod}가 Get방식이고, {@link HttpForm}이 추가되었다면 QueryString으로 사용한다.
+   * 목적지의 Endpoint를 가져온다. 만약 {@link HttpMethod}가 Get방식이고, {@link HttpForm}이 추가되었다면 QueryString으로 사용한다.
    *
    * @return Endpoint URI 문자열
-   * @since 1.0
+   * @since 1.0.0
    */
   public String getEndpointUri() {
     StringBuilder endpoint = new StringBuilder();
     endpoint.append(uri);
     ObjectUtil.thenNonEmpty(form, form -> endpoint.append("?").append(form.toFormString()));
     return endpoint.toString();
-  }
-
-  public Converter getConverter() {
-    return converter;
   }
 
   public boolean isBody() {

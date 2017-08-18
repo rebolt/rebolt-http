@@ -28,7 +28,7 @@ import java.util.Map;
  * rebolt-http에서 제공하는 기본 {@link Converter} 목록
  * 초기화 런타임시점(static)에 모든 {@link Converter}를 활성화시킨다.
  *
- * @since 1.0
+ * @since 1.0.0
  */
 public final class ConverterTable {
   /**
@@ -64,7 +64,7 @@ public final class ConverterTable {
      * {@link StringToJsonConverter}
      */
     add(String.class, JsonNode.class, StringToJsonConverter.class);
-    add(void.class, JsonNode.class, StringToJsonConverter.class);
+    add(void.class, JsonNode.class, VoidToJsonConverter.class);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class ConverterTable {
    * @param requestType 요청 페이로드
    * @param responseType 응답 페이로드
    * @param converterType 컨버터타입
-   * @since 1.0
+   * @since 1.0.0
    */
   public static synchronized void add(Class<?> requestType, Class<?> responseType, Class<? extends Converter> converterType) {
     Map<Class, Converter> converterMap = converterTable.get(requestType);
@@ -94,12 +94,12 @@ public final class ConverterTable {
    * @param requestType 요청 페이로드
    * @param responseType 응답 페이로드
    * @return {@link Converter}
-   * @since 1.0
+   * @since 1.0.0
    */
   public static Converter get(Class<?> requestType, Class<?> responseType) {
     Map<Class, Converter> converterMap = converterTable.get(requestType);
     if (converterMap == null) {
-      return null;
+      converterMap = converterTable.get(void.class);
     }
     Converter converter = converterMap.get(responseType);
     if (converter == null) {
@@ -114,7 +114,7 @@ public final class ConverterTable {
    *
    * @param body Request Body
    * @return {@link Class}
-   * @since 1.0
+   * @since 1.0.0
    */
   public static Class getBodyType(Object body) {
     if (ObjectUtil.isNull(body)) {
@@ -127,9 +127,9 @@ public final class ConverterTable {
    * 기본 {@link Converter} 조회
    *
    * @return {@link Converter}
-   * @since 1.0
+   * @since 1.0.0
    */
   public static Converter getDefault() {
-    return get(String.class, String.class);
+    return get(void.class, JsonNode.class);
   }
 }

@@ -13,30 +13,26 @@ import lombok.ToString;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.net.HttpHeaders.*;
 import static io.rebolt.http.HttpHeader.Header.Accept;
+import static io.rebolt.http.HttpHeader.Header.ContentType;
 import static io.rebolt.http.HttpHeader.Header.UserAgent;
 
 @ToString
 public final class HttpHeader implements IModel<HttpHeader> {
   private static final long serialVersionUID = 576771757645112134L;
-  private static final String userAgent = "Rebolt-Http/1.0";
+  private static final String userAgent = "ReboltHttp/2.0";
   private @Getter Map<String, String> headerMap;
 
   /**
    * HttpHeader 생성 (기본값 포함, 요청용)
-   * <p>
-   * User-Agent : Rebolt-Http/(version) (RFC 7231: https://tools.ietf.org/html/rfc7231#section-5.5.3)
-   * Content-Type : FORM DATA
-   * Accept : PLAIN TEXT (UTF-8)
-   * <p>
    *
    * @return {@link HttpHeader}
-   * @since 1.0
+   * @since 1.0.0
    */
   public static HttpHeader create() {
     return new HttpHeader()
-        .add(UserAgent, userAgent)
-        .add(Accept, MediaType.PLAIN_TEXT_UTF_8);
+        .add(UserAgent, userAgent);
   }
 
   /**
@@ -44,7 +40,7 @@ public final class HttpHeader implements IModel<HttpHeader> {
    *
    * @param converter {@link Converter}
    * @return {@link HttpHeader}
-   * @since 1.0
+   * @since 1.0.0
    */
   public static HttpHeader create(Converter converter) {
     return new HttpHeader()
@@ -68,46 +64,63 @@ public final class HttpHeader implements IModel<HttpHeader> {
   }
 
   public HttpHeader add(String header, String value) {
-    headerMap.put(header, value);
+    if (!StringUtil.isNullOrEmpty(value)) {
+      headerMap.put(header, value);
+    }
     return this;
   }
 
   public HttpHeader add(Header header, MediaType mediaType) {
+    if (ObjectUtil.isNull(mediaType)) {
+      return this;
+    }
     return add(header.getHeader(), mediaType.toString());
   }
 
   public HttpHeader add(String header, MediaType mediaType) {
+    if (ObjectUtil.isNull(mediaType)) {
+      return this;
+    }
     return add(header, mediaType.toString());
   }
 
   public HttpHeader add(Header header, String value) {
+    if (StringUtil.isNullOrEmpty(value)) {
+      return this;
+    }
     return add(header.getHeader(), value);
   }
 
   public HttpHeader add(String header, List<String> values) {
+    if (ObjectUtil.isEmpty(values)) {
+      return this;
+    }
     headerMap.put(header, StringUtil.join("; ", values));
     return this;
   }
 
   public HttpHeader addAll(HttpHeader httpHeader) {
+    if (ObjectUtil.isEmpty(httpHeader)) {
+      return this;
+    }
     headerMap.putAll(httpHeader.getHeaderMap());
     return this;
   }
 
   public HttpHeader addAccept(String accept) {
-    return add(Header.Accept, accept);
+    return add(Accept, accept);
   }
 
   public HttpHeader addAccept(MediaType meidaType) {
-    return add(Header.Accept, meidaType);
+    return add(Accept, meidaType);
   }
 
   public HttpHeader addContentType(String contentType) {
-    return add(Header.ContentType, contentType);
+    return add(ContentType, contentType);
   }
 
   public HttpHeader addContentType(MediaType mediaType) {
-    return add(Header.ContentType, mediaType);
+    return add(ContentType, mediaType);
   }
 
   public String get(String header) {
@@ -119,11 +132,11 @@ public final class HttpHeader implements IModel<HttpHeader> {
   }
 
   public String getAccept() {
-    return headerMap.get(Header.Accept.getHeader());
+    return headerMap.get(Accept.getHeader());
   }
 
   public String getContentType() {
-    return headerMap.get(Header.ContentType.getHeader());
+    return headerMap.get(ContentType.getHeader());
   }
 
   @Override
@@ -145,11 +158,11 @@ public final class HttpHeader implements IModel<HttpHeader> {
    * Header 정의
    */
   public enum Header {
-    Accept("Accept"),
-    Authorization("Authorization"),
-    CacheControl("Cache-Control"),
-    ContentType("Content-Type"),
-    UserAgent("User-Agent");
+    Accept(ACCEPT),
+    Authorization(AUTHORIZATION),
+    CacheControl(CACHE_CONTROL),
+    ContentType(CONTENT_TYPE),
+    UserAgent(USER_AGENT);
 
     private final @Getter String header;
 

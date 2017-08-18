@@ -14,9 +14,10 @@
  * under the License.
  */
 
-import io.rebolt.http.HttpResponse;
 import io.rebolt.http.HttpStatus;
 import io.rebolt.http.fluent.ReboltHttp;
+import io.rebolt.http.fluent.RestResponse;
+import lombok.Data;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -25,9 +26,37 @@ public final class Test_ReboltHttp {
 
   @Test
   public void test_get() {
-    HttpResponse<String> response = ReboltHttp.get().uri("https://m-api.nexon.com").call();
+    RestResponse<String> response = ReboltHttp.get(String.class).uri("https://m-api.nexon.com").call();
 
     assertTrue(response.getStatus() == HttpStatus.OK_200);
     assertTrue(response.getBody().length() > 0);
   }
+
+  @Data
+  public static class Api2 {
+    private String server;
+  }
+
+  @Data
+  public static class ToyResponse {
+    private Integer errorCode;
+    private String errorText;
+    private String errorDetail;
+    private Object result;
+  }
+
+  @Test
+  public void test_get2() {
+    RestResponse<Api2> response = ReboltHttp.get(Api2.class).uri("https://api2.account.nexon.com").call();
+    assertTrue(response.getStatus() == HttpStatus.OK_200);
+    assertTrue(response.getBody().getServer().equals("account"));
+  }
+
+  @Test
+  public void test_get3() {
+    RestResponse<ToyResponse> response = ReboltHttp.get(ToyResponse.class).uri("https://m-api.nexon.com/error").call();
+    assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
+    assertTrue(response.getError(ToyResponse.class).errorCode == -2);
+  }
+
 }

@@ -102,7 +102,7 @@ public abstract class AbstractFactory {
    * @since 1.0
    */
   public void addConverter(Class<?> requestType, Class<?> responseType, Class<? extends Converter> converterType) {
-    ObjectUtil.isOrNull(requestType, responseType, converterType);
+    ObjectUtil.requireNonNull(requestType, responseType, converterType);
     ConverterTable.add(requestType, responseType, converterType);
   }
 

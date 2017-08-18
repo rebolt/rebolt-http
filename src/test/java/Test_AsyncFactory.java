@@ -31,7 +31,7 @@ public final class Test_AsyncFactory {
     HttpRequest request = HttpRequest.create().uri("https://m-api.nexon.com");
 
     Thread mainThread = Thread.currentThread();
-    factory.invoke(request, (HttpResponse<String> response) -> {
+    factory.invoke(request, (HttpResponse<String, String> response) -> {
       try {
         if (!response.hasError()) {
           assertTrue(response.getStatus().equals(HttpStatus.OK_200));
@@ -54,7 +54,7 @@ public final class Test_AsyncFactory {
     HttpRequest request = HttpRequest.create(JsonNode.class).uri("https://m-api.nexon.com/signin.nx");
 
     Thread mainThread = Thread.currentThread();
-    factory.invoke(request, (HttpResponse<JsonNode> response) -> {
+    factory.invoke(request, (HttpResponse<JsonNode, JsonNode> response) -> {
       try {
         if (!response.hasError()) {
           assertTrue(response.getStatus().equals(HttpStatus.OK_200));
