@@ -54,9 +54,8 @@ public final class Test_ReboltHttp {
 
   @Test
   public void test_get3() {
-    RestResponse<ToyResponse> response = ReboltHttp.get(ToyResponse.class).uri("https://m-api.nexon.com/error").call();
+    RestResponse<ToyResponse> response = ReboltHttp.get(ToyResponse.class).uri("https://m-api.nexon.com/error").query("id", "yours").call();
     assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
     assertTrue(response.getError(ToyResponse.class).errorCode == -2);
   }
-
 }

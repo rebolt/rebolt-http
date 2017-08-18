@@ -3,6 +3,10 @@ package io.rebolt.http.fluent;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import io.rebolt.core.exceptions.IllegalParameterException;
+import io.rebolt.core.exceptions.NotInitializedException;
+import io.rebolt.core.utils.ObjectUtil;
+import io.rebolt.core.utils.StringUtil;
+import io.rebolt.http.HttpForm;
 import io.rebolt.http.HttpHeader;
 import io.rebolt.http.HttpMethod;
 import io.rebolt.http.HttpRequest;
@@ -14,6 +18,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
+import static io.rebolt.core.constants.Constants.STRING_AND;
+import static io.rebolt.core.constants.Constants.STRING_QUESTION;
 import static io.rebolt.http.HttpMethod.*;
 
 /**
@@ -43,7 +49,8 @@ public final class ReboltHttp<T> {
   private final Class<T> responseType;
   private final HttpMethod method;
   private HttpHeader httpHeader;
-  private URI uri;
+  private String uri;
+  private HttpForm query = HttpForm.create();
   private Object body;
   private boolean throwException = false;
 
@@ -94,11 +101,12 @@ public final class ReboltHttp<T> {
    * @param uri https://www.nexon.com?k=v
    */
   public ReboltHttp<T> uri(String uri) {
-    try {
-      this.uri = new URI(uri);
-    } catch (URISyntaxException e) {
-      throw new IllegalParameterException(e);
-    }
+    this.uri = uri;
+    return this;
+  }
+
+  public ReboltHttp<T> query(String key, String value) {
+    query.add(key, value);
     return this;
   }
 
@@ -143,8 +151,27 @@ public final class ReboltHttp<T> {
         break;
     }
 
+    // step 2 : fullUri 계산
+    if (StringUtil.isNullOrEmpty(uri)) {
+      throw new NotInitializedException(".uri()");
+    }
+    URI fullUri;
+    try {
+      if (ObjectUtil.isEmpty(query)) {
+        fullUri = new URI(uri);
+      } else {
+        if (uri.contains(STRING_QUESTION)) {
+          fullUri = new URI(uri + STRING_AND + query.toFormString());
+        } else {
+          fullUri = new URI(uri + STRING_QUESTION + query.toFormString());
+        }
+      }
+    } catch (URISyntaxException e) {
+      throw new IllegalParameterException(e);
+    }
+
     // step 2 : SyncFactory 호출
-    String host = uri.getHost();
+    String host = fullUri.getHost();
     if (!syncMap.containsKey(host)) {
       syncMap.put(host, new SyncFactory());
     }
@@ -154,7 +181,7 @@ public final class ReboltHttp<T> {
         syncMap.get(host).invoke(
             HttpRequest.create(requestType, responseType)
                 .method(method)
-                .uri(uri.toString())
+                .uri(fullUri.toString())
                 .body(body)
                 .header(httpHeader)),
         throwException);
