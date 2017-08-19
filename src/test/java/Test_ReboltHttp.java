@@ -33,7 +33,7 @@ public final class Test_ReboltHttp {
   }
 
   @Data
-  public static class Api2 {
+  public static class Profile {
     private String server;
   }
 
@@ -47,9 +47,9 @@ public final class Test_ReboltHttp {
 
   @Test
   public void test_get2() {
-    RestResponse<Api2> response = ReboltHttp.get(Api2.class).uri("https://api2.account.nexon.com").call();
+    RestResponse<Profile> response = ReboltHttp.get(Profile.class).uri("https://api.nexon.io/profile").call();
     assertTrue(response.getStatus() == HttpStatus.OK_200);
-    assertTrue(response.getBody().getServer().equals("account"));
+    assertTrue(response.getBody().getServer().equals("profile"));
   }
 
   @Test
