@@ -35,6 +35,7 @@ public final class Test_ReboltHttp {
   @Data
   public static class Profile {
     private String server;
+    private String version;
   }
 
   @Data

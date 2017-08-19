@@ -45,7 +45,7 @@ public final class Test_SyncFactory {
     HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.NOT_FOUND_404));
-    assertTrue(response.getBody().get("errorCode").asInt() == -2);
+    assertTrue(response.getError().get("errorCode").asInt() == -2);
   }
 
   @Test
@@ -56,10 +56,10 @@ public final class Test_SyncFactory {
         .method(HttpMethod.Post)
         .contentType(MediaType.JSON_UTF_8)
         .accept(MediaType.JSON_UTF_8)
-        .body("{\"svcID\":1003,\"npSN\":\"10030000000001132\",\"npToken\":\"TOTmgZqnjLwSBD0kFeEUpRsvb008o76O7W5SEh9Ud651UPa73lFN\"}");
+        .body("{\"svcID\":1003,\"npSN\":\"10030000000001132\",\"npToken\":\"TEST\"}");
     HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));
-    assertTrue(response.getBody().get("errorCode").asInt() == 5002);
+    assertTrue(response.getBody().get("errorCode").asInt() == -13);
   }
 }
