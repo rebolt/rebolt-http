@@ -25,16 +25,12 @@ import static io.rebolt.http.HttpMethod.*;
 /**
  * 복잡한 초기 설정 없이 곧바로 Restful API 요청을 할 수 있다.
  * <p>
- * 사용예)
- * {@code HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();}
- * {@code HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();}
- * {@code HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();}
- * {@code HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();}
+ * 사용예) {@code HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();} {@code HttpResponse<String> response =
+ * ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();} {@code HttpResponse<String> response =
+ * ReboltHttp.get(String.class).uri("http://nexon.com").call();} {@code HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();}
  * {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
- * "...").body(formString).call(); }
- * {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
- * "...").body(formString).call();}
- * {@code ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });}
+ * "...").body(formString).call(); } {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization",
+ * "...").hedaer("X-User-Protocol", "...").body(formString).call();} {@code ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });}
  *
  * @version 1.1.0
  * @since 1.0.0
@@ -69,6 +65,10 @@ public final class ReboltHttp<T> {
     return new ReboltHttp<>(Get, responseType);
   }
 
+  public static ReboltHttp<JsonNode> post() {
+    return new ReboltHttp<>(Post, JsonNode.class);
+  }
+
   public static <T> ReboltHttp<T> post(Class<T> responseType) {
     return new ReboltHttp<>(Post, responseType);
   }
@@ -87,6 +87,10 @@ public final class ReboltHttp<T> {
 
   public static <T> ReboltHttp<T> delete(Class<T> responseType) {
     return new ReboltHttp<>(Delete, responseType);
+  }
+
+  public static ReboltHttp<JsonNode> put() {
+    return new ReboltHttp<>(Put, JsonNode.class);
   }
 
   public static <T> ReboltHttp<T> put(Class<T> responseType) {
