@@ -11,7 +11,7 @@ import io.rebolt.http.engines.OkHttp3Engine;
 /**
  * 비동기패턴 클라이언트 팩토리
  *
- * @since 1.0
+ * @since 1.0.0
  */
 public final class AsyncFactory extends AbstractFactory {
 
@@ -46,8 +46,9 @@ public final class AsyncFactory extends AbstractFactory {
    *
    * @param request 요청객체
    * @param callback 콜백 {@link HttpCallback}
-   * @param <R> 페이로드 콜백 클래스 (내부에 응답 클래스 포함 : {@link HttpResponse})
-   * @since 1.0
+   * @param <R> 콜백 클래스 (내부에 응답 클래스 포함 : {@link HttpResponse})
+   * @param <E> 에러 클래스
+   * @since 1.0.0
    */
   @SuppressWarnings("unchecked")
   public <R, E> void invoke(HttpRequest request, HttpCallback<R, E> callback) {

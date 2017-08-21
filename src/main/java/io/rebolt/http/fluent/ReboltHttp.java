@@ -24,13 +24,6 @@ import static io.rebolt.http.HttpMethod.*;
 
 /**
  * 복잡한 초기 설정 없이 곧바로 Restful API 요청을 할 수 있다.
- * <p>
- * 사용예) {@code HttpResponse<String> response = ReboltHttp.get(String.class).uri("http://nexon.com").call();} {@code HttpResponse<String> response =
- * ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();} {@code HttpResponse<String> response =
- * ReboltHttp.get(String.class).uri("http://nexon.com").call();} {@code HttpResponse<String> response = ReboltHttp.post(String.class).uri("http://api.nexon.com").body(formString).call();}
- * {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization", "...").hedaer("X-User-Protocol",
- * "...").body(formString).call(); } {@code HttpResponse<JsonNode> response = ReboltHttp.post(JsonNode.class).uri("http://api.nexon.com").header("Authorization",
- * "...").hedaer("X-User-Protocol", "...").body(formString).call();} {@code ReboltHttp.get().uri("http://nexon.com").asyncCall(response -> { ... });}
  *
  * @version 1.1.0
  * @since 1.0.0
@@ -103,6 +96,7 @@ public final class ReboltHttp<T> {
 
   /**
    * @param uri https://www.nexon.com?k=v
+   * @return {@link ReboltHttp}
    */
   public ReboltHttp<T> uri(String uri) {
     this.uri = uri;

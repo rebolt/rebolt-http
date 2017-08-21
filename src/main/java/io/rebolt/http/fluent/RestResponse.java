@@ -44,9 +44,6 @@ public final class RestResponse<R> {
   }
 
   public <E> E getError(Class<E> errorType) {
-    if (hasError()) {
-      return JsonUtil.read(response.getError(), errorType);
-    }
-    return null;
+    return JsonUtil.read(response.getError(), errorType);
   }
 }
