@@ -15,6 +15,7 @@
  */
 
 import io.rebolt.http.HttpStatus;
+import io.rebolt.http.exceptions.HttpException;
 import io.rebolt.http.fluent.ReboltHttp;
 import io.rebolt.http.fluent.RestResponse;
 import lombok.Data;
