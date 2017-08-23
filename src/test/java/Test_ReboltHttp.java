@@ -14,6 +14,7 @@
  * under the License.
  */
 
+import io.rebolt.http.HttpForm;
 import io.rebolt.http.HttpStatus;
 import io.rebolt.http.fluent.ReboltHttp;
 import io.rebolt.http.fluent.RestResponse;
@@ -58,5 +59,11 @@ public final class Test_ReboltHttp {
     RestResponse<ToyResponse> response = ReboltHttp.get(ToyResponse.class).uri("https://m-api.nexon.com/error").query("id", "yours").call();
     assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
     assertTrue(response.getError(ToyResponse.class).errorCode == -2);
+  }
+
+  @Test
+  public void test_post() {
+    RestResponse<ToyResponse> response = ReboltHttp.post(ToyResponse.class).uri("https://m-api.nexon.com/error").body(HttpForm.create().add("id", "yours")).call();
+    assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
   }
 }

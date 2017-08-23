@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import io.rebolt.core.exceptions.IllegalParameterException;
 import io.rebolt.core.exceptions.NotInitializedException;
+import io.rebolt.core.exceptions.NullPointerException;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.core.utils.StringUtil;
 import io.rebolt.http.HttpForm;
@@ -145,6 +146,9 @@ public final class ReboltHttp<T> {
         requestType = void.class;
         break;
       default:
+        if (body == null) {
+          throw new NullPointerException("\"Body\" must be included");
+        }
         requestType = ConverterTable.getBodyType(body);
         break;
     }

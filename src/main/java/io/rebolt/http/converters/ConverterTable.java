@@ -103,7 +103,7 @@ public final class ConverterTable {
     }
     Converter converter = converterMap.get(responseType);
     if (converter == null) {
-      return getDefault();
+      return getDefault(requestType);
     }
     return converter;
   }
@@ -126,10 +126,11 @@ public final class ConverterTable {
   /**
    * 기본 {@link Converter} 조회
    *
+   * @param requestType {@link Class}
    * @return {@link Converter}
-   * @since 1.0.0
+   * @since 1.1.3
    */
-  public static Converter getDefault() {
-    return get(void.class, JsonNode.class);
+  public static Converter getDefault(Class<?> requestType) {
+    return get(requestType, JsonNode.class);
   }
 }
