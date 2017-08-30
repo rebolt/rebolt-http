@@ -5,7 +5,7 @@ import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpStatus;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.logging.log4j.Level;
+import org.slf4j.event.Level;
 
 import static io.rebolt.core.constants.Constants.STRING_EMPTY;
 
@@ -19,15 +19,15 @@ public final class HttpException extends ReboltException {
     this(HttpStatus.lookup(status), STRING_EMPTY);
   }
 
-  public HttpException(int status, final String message) {
+  public HttpException(int status, String message) {
     this(HttpStatus.lookup(status), message);
   }
 
-  public HttpException(final HttpStatus status) {
+  public HttpException(HttpStatus status) {
     this(status, STRING_EMPTY);
   }
 
-  public HttpException(final HttpStatus status, final String message) {
+  public HttpException(HttpStatus status, String message) {
     this.status = status;
     this.message = message;
     super.setMessage("http_status: " + status + ", " + message);

@@ -16,6 +16,7 @@
 
 package io.rebolt.http.engines;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.rebolt.core.utils.JsonUtil;
 import io.rebolt.core.utils.LogUtil;
@@ -45,6 +46,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.rebolt.http.HttpMethod.Get;
+import static io.rebolt.http.HttpStatus.BAD_REQUEST_400;
 import static io.rebolt.http.HttpStatus.REQUEST_FAILED_499;
 import static io.rebolt.http.HttpStatus.REQUEST_TIMEOUT_408;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -117,7 +119,7 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
    *
    * @param httpRequest {@link HttpRequest}
    * @param response {@link Response}
-   * @since 1.0
+   * @since 1.0.0
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -138,8 +140,14 @@ public final class OkHttp3Engine extends AbstractEngine<Request, Response, Callb
     // parse response
     Object responseObject = httpRequest.getConverter().convertResponse(responseBytes);
     if (responseObject instanceof JsonNode && httpRequest.getResponseType() != JsonNode.class && response.isSuccessful()) {
-      Object parsedResponseObject = JsonUtil.read((JsonNode) responseObject, httpRequest.getResponseType());
-      return new HttpResponse(response.code(), header, parsedResponseObject, null);
+      Object parsedResponseObject;
+      try {
+        parsedResponseObject = JsonUtil.read((JsonNode) responseObject, httpRequest.getResponseType(), true);
+      } catch (JsonProcessingException e) {
+        // parse error
+        return new HttpResponse(BAD_REQUEST_400, header, new HttpException(BAD_REQUEST_400, e.getMessage()));
+      }
+      return new HttpResponse(response.code(), header, parsedResponseObject);
     } else {
       return new HttpResponse(response.code(), header, responseObject);
     }

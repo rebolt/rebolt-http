@@ -47,6 +47,11 @@ public final class Test_ReboltHttp {
     private Object result;
   }
 
+  @Data
+  public class ErrorClass {
+    private String error;
+  }
+
   @Test
   public void test_get2() {
     RestResponse<Profile> response = ReboltHttp.get(Profile.class).uri("https://api.nexon.io/profile").call();
@@ -65,5 +70,12 @@ public final class Test_ReboltHttp {
   public void test_post() {
     RestResponse<ToyResponse> response = ReboltHttp.post(ToyResponse.class).uri("https://m-api.nexon.com/error").body(HttpForm.create().add("id", "yours")).call();
     assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
+  }
+
+  @Test
+  public void test_post_miss_responseType() {
+    RestResponse<ErrorClass> response = ReboltHttp.post(ErrorClass.class).uri("https://api.nexon.io/profile").body(HttpForm.create().add("id", "yours")).call();
+    assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST_400);
+    assertTrue(response.getException().hasError());
   }
 }

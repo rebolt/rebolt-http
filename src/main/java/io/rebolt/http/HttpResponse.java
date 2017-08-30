@@ -64,6 +64,12 @@ public class HttpResponse<R, E> implements IModel<HttpResponse> {
     this.exception = exception;
   }
 
+  public HttpResponse(HttpStatus status, HttpHeader header, HttpException exception) {
+    this.status = status;
+    this.header = header;
+    this.exception = exception;
+  }
+
   public HttpResponse(HttpStatus status, HttpHeader header, R body, E error, HttpException exception) {
     this.status = status;
     this.header = header;
