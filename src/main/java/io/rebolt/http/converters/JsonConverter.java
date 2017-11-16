@@ -17,44 +17,33 @@
 package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import io.rebolt.core.utils.LogUtil;
+import io.rebolt.core.utils.JsonUtil;
 import io.rebolt.core.utils.ObjectUtil;
 
 import java.io.IOException;
 
+import static io.rebolt.core.constants.Constants.CHARSET_UTF8;
+
 /**
  * {@link JsonNode} to {@link JsonNode} 컨버터
- *
+ * <p>
  * ContentType: application/json;charset=utf-8"
  * Accept: "application/json;charset=utf-8"
  */
 final class JsonConverter implements BytesConverter<JsonNode, JsonNode> {
   @Override
   public byte[] convertRequest(JsonNode jsonNode) {
-    if (ObjectUtil.isNull(jsonNode)) {
-      return new byte[0];
-    }
     try {
-      return jsonNode.binaryValue();
-    } catch (IOException e) {
-      LogUtil.warn(e);
+      return !ObjectUtil.isNull(jsonNode) ? jsonNode.binaryValue() : new byte[0];
+    } catch (IOException ignore) {
       return new byte[0];
     }
   }
 
   @Override
   public JsonNode convertResponse(byte[] rawResponse) {
-    if (ObjectUtil.isNull(rawResponse)) {
-      return null;
-    }
-    try {
-      return new ObjectMapper().readTree(rawResponse);
-    } catch (IOException e) {
-      LogUtil.warn(e);
-      return null;
-    }
+    return !ObjectUtil.isNull(rawResponse) ? JsonUtil.read(new String(rawResponse, CHARSET_UTF8)) : null;
   }
 
   @Override
