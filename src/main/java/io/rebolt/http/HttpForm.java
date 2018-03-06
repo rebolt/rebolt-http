@@ -39,7 +39,9 @@ public final class HttpForm implements IModel<HttpForm> {
     Map<String, String> queryMap = Maps.newHashMapWithExpectedSize(queryList.size());
     queryList.forEach(entry -> {
       List<String> items = split('=', entry);
-      queryMap.put(decodeUrl(items.get(0)), decodeUrl(items.get(1)));
+      if (items.size() >= 2) {
+        queryMap.put(decodeUrl(items.get(0)), decodeUrl(items.get(1)));
+      }
     });
     return create().addAll(queryMap);
   }

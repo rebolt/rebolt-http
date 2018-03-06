@@ -17,43 +17,28 @@
 package io.rebolt.http.converters;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.net.MediaType;
-import io.rebolt.core.utils.LogUtil;
+import io.rebolt.core.utils.JsonUtil;
 import io.rebolt.core.utils.ObjectUtil;
 import io.rebolt.http.HttpForm;
-import lombok.Getter;
-
-import java.io.IOException;
 
 import static io.rebolt.core.constants.Constants.CHARSET_UTF8;
 
 /**
  * {@link HttpForm} to {@link JsonNode} 컨버터
- *
+ * <p>
  * ContentType: "application/x-www-form-urlencoded;charset=utf-8"
  * Accept: "application/json;charset=utf-8"
  */
 final class FormToJsonConverter implements BytesConverter<HttpForm, JsonNode> {
   @Override
   public byte[] convertRequest(HttpForm httpForm) {
-    if (ObjectUtil.isNull(httpForm)) {
-      return new byte[0];
-    }
-    return httpForm.toFormString().getBytes(CHARSET_UTF8);
+    return !ObjectUtil.isNull(httpForm) ? httpForm.toFormString().getBytes(CHARSET_UTF8) : new byte[0];
   }
 
   @Override
   public JsonNode convertResponse(byte[] rawResponse) {
-    if (ObjectUtil.isNull(rawResponse)) {
-      return null;
-    }
-    try {
-      return new ObjectMapper().readTree(rawResponse);
-    } catch (IOException e) {
-      LogUtil.warn(e);
-      return null;
-    }
+    return !ObjectUtil.isNull(rawResponse) ? JsonUtil.read(new String(rawResponse, CHARSET_UTF8)) : null;
   }
 
   @Override
