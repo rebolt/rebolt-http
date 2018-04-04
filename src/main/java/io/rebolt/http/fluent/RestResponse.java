@@ -2,6 +2,7 @@ package io.rebolt.http.fluent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.rebolt.core.utils.JsonUtil;
+import io.rebolt.http.HttpHeader;
 import io.rebolt.http.HttpResponse;
 import io.rebolt.http.HttpStatus;
 import io.rebolt.http.exceptions.HttpException;
@@ -33,6 +34,10 @@ public final class RestResponse<R> {
 
   public R getBody() {
     return response.getBody();
+  }
+
+  public HttpHeader getHeader() {
+    return response.getHeader();
   }
 
   public JsonNode getError() {

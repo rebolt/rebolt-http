@@ -29,8 +29,10 @@ sourceSets {
 }
 
 dependencies {
+  compileOnly "org.projectlombok:lombok:$ver_lombok"
   compile "com.github.rebolt:rebolt-core:$ver_rebolt_core"
   compile "com.squareup.okhttp3:okhttp:$ver_okhttp"
+  compile "com.google.guava:guava:$ver_guava"
 
   perfCompile project
   perfCompile "org.openjdk.jmh:jmh-core:$ver_jmh"
