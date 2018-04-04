@@ -34,7 +34,8 @@ public final class Test_ReboltHttp {
   }
 
   @Data
-  public static class Profile {
+  public static class Session {
+    private String environment;
     private String server;
     private String version;
   }
@@ -54,9 +55,9 @@ public final class Test_ReboltHttp {
 
   @Test
   public void test_get2() {
-    RestResponse<Profile> response = ReboltHttp.get(Profile.class).uri("https://api.nexon.io/profile").call();
+    RestResponse<Session> response = ReboltHttp.get(Session.class).uri("https://session.nexon.com").call();
     assertTrue(response.getStatus() == HttpStatus.OK_200);
-    assertTrue(response.getBody().getServer().equals("profile"));
+    assertTrue(response.getBody().getServer().equals("nest-api"));
   }
 
   @Test
@@ -70,12 +71,5 @@ public final class Test_ReboltHttp {
   public void test_post() {
     RestResponse<ToyResponse> response = ReboltHttp.post(ToyResponse.class).uri("https://m-api.nexon.com/error").body(HttpForm.create().add("id", "yours")).call();
     assertTrue(response.getStatus() == HttpStatus.NOT_FOUND_404);
-  }
-
-  @Test
-  public void test_post_miss_responseType() {
-    RestResponse<ErrorClass> response = ReboltHttp.post(ErrorClass.class).uri("https://api.nexon.io/profile").body(HttpForm.create().add("id", "yours")).call();
-    assertTrue(response.getStatus() == HttpStatus.BAD_REQUEST_400);
-    assertTrue(response.getException().hasError());
   }
 }

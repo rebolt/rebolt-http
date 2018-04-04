@@ -40,5 +40,6 @@ dependencies {
   perfCompile "org.openjdk.jmh:jmh-generator-annprocess:$ver_jmh"
 
   testCompile "junit:junit:$ver_junit"
+  testCompile "org.projectlombok:lombok:$ver_lombok"
 }
 
