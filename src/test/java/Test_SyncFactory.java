@@ -60,6 +60,6 @@ public final class Test_SyncFactory {
     HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
 
     assertTrue(response.getStatus().equals(HttpStatus.OK_200));
-    assertTrue(response.getBody().get("errorCode").asInt() == -13);
+    assertTrue(response.getBody().get("errorCode").asInt() == 5001);
   }
 }
