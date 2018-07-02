@@ -47,19 +47,4 @@ public final class Test_SyncFactory {
     assertTrue(response.getStatus().equals(HttpStatus.NOT_FOUND_404));
     assertTrue(response.getError().get("errorCode").asInt() == -2);
   }
-
-  @Test
-  public void test_post() {
-    SyncFactory factory = new SyncFactory();
-    HttpRequest request = HttpRequest.create(String.class, JsonNode.class)
-        .uri("https://m-api.nexon.com/svr/validateNPToken.nx")
-        .method(HttpMethod.Post)
-        .contentType(MediaType.JSON_UTF_8)
-        .accept(MediaType.JSON_UTF_8)
-        .body("{\"svcID\":1003,\"npSN\":\"10030000000001132\",\"npToken\":\"TEST\"}");
-    HttpResponse<JsonNode, JsonNode> response = factory.invoke(request);
-
-    assertTrue(response.getStatus().equals(HttpStatus.OK_200));
-    assertTrue(response.getBody().get("errorCode").asInt() == 5001);
-  }
 }
